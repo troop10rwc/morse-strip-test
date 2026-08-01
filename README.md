@@ -26,8 +26,6 @@ Along the way it also includes:
 2. Double-click it (or drag it into a browser tab). It opens and runs fully offline.
 3. Work through Setup → Settings → the three requirement tabs → Certificate.
 
-Anything you'd like to customize — practice passages, colors, pass thresholds — lives in plain text inside the `<script>` section of `index.html`, and can be edited directly or with the help of an AI coding assistant.
-
 ## Hosting it on GitHub Pages
 
 This repository is set up to be published with **GitHub Pages**, so you can share one link with your whole troop instead of emailing a file around.
@@ -52,7 +50,7 @@ This repository is set up to be published with **GitHub Pages**, so you can shar
 
 ## Notes on content
 
-The 2-minute copy passages are written in the spirit of Robert Baden-Powell's Scouting writings (public domain: *Scouting for Boys*, 1908, and his 1941 Farewell Message), lightly paraphrased so the app can reliably match exact words. Swap in verbatim historical text if you want it for ceremonial use.
+The 2-minute copy passages are written in the spirit of Robert Baden-Powell's Scouting writings (public domain: *Scouting for Boys*, 1908, and his 1941 Farewell Message), lightly paraphrased so the app can reliably match exact words.
 
 ## License
 
