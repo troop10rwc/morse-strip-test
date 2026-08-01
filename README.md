@@ -3,7 +3,7 @@
 
 A free, self-contained web app for Scouts practicing and self-testing for the official **Morse Code Interpreter Strip**. It walks a Scout through all three ARRL/BSA requirements, tracks progress on their own device, and generates a printable completion certificate for their unit leader or counselor to sign off on.
 
-The entire app is a single file, `index.html` — no build step, no server, no account required. It runs completely offline once loaded.
+The entire app is a single file, `index.html` — no build step, no server, no account required. It can be downloaded and run offline, or accessed at [https://troop10rwc.github.io/morse-strip-test/]
 
 ## What it covers
 
