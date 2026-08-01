@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morse Code Interpreter Strip — Practice &amp; Test</title>
+<style>
+  :root{
+    /* Official Scouting America brand colors (Scouts BSA program):
+       Source: Scouting America Official Brand Colors and Typefaces */
+    --navy:#003366;   /* Scouting America Dark Blue */
+    --gold:#B39475;   /* Scouting America Tan / Scouts BSA Tan (replaces a generic gold accent) */
+    --tan-dark:#AD9D7B; /* Scouting America Dark Tan */
+    --tan-light:#D6CEBD; /* Scouting America Light Tan */
+    --red:#CE1126;    /* Scouting America Red / Scouts BSA Red */
+    --cream:#E9E9E4;  /* Scouting America Pale Gray */
+    --ink:#232528;    /* Scouting America Neutral Black */
+    --line:#AD9D7B;   /* Scouting America Dark Tan */
+    --good:#006B3F;   /* Scouting America Green (Venturing Green swatch) */
+    --bad:#CE1126;    /* Scouting America Red */
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap');
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:Verdana, Arial, sans-serif; background:var(--cream); color:var(--ink);
+  }
+  header{
+    background:var(--navy); color:#fff; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+  header h1{ margin:0; font-size:1.2rem; font-family:'Montserrat', Arial, sans-serif; font-weight:700; display:flex; align-items:center; gap:10px; }
+  header .stripIcon{ height:34px; width:auto; border-radius:3px; border:1px solid rgba(255,255,255,0.4); }
+  header .who{ font-size:0.85rem; opacity:0.85; }
+  nav{
+    display:flex; gap:4px; background:#fff; border-bottom:2px solid var(--navy); padding:0 12px; overflow-x:auto;
+  }
+  nav button{
+    font-family:inherit; font-size:0.9rem; padding:12px 14px; border:none; background:none; cursor:pointer;
+    border-bottom:3px solid transparent; color:var(--navy); white-space:nowrap;
+  }
+  nav button.active{ border-bottom-color:var(--gold); font-weight:bold; }
+  nav button:disabled{ color:#aaa; cursor:not-allowed; }
+  main{ max-width:760px; margin:0 auto; padding:20px 16px 60px; }
+  section{ display:none; }
+  section.active{ display:block; }
+  h2{ color:var(--navy); border-bottom:2px solid var(--gold); padding-bottom:6px; font-family:'Montserrat', Arial, sans-serif; font-weight:700; }
+  label{ display:block; margin:12px 0 4px; font-weight:bold; }
+  input[type=text], select{
+    width:100%; padding:8px; font-size:1rem; border:1px solid var(--line); border-radius:4px; font-family:inherit;
+  }
+  .row{ display:flex; gap:16px; flex-wrap:wrap; }
+  .row > div{ flex:1; min-width:180px; }
+  button.primary{
+    background:var(--navy); color:#fff; border:none; padding:10px 18px; border-radius:4px; font-size:1rem; cursor:pointer; margin-top:12px;
+  }
+  button.primary:hover{ background:#123063; }
+  button.secondary{
+    background:#fff; color:var(--navy); border:1px solid var(--navy); padding:10px 18px; border-radius:4px; font-size:1rem; cursor:pointer; margin-top:12px;
+  }
+  button:disabled{ opacity:0.5; cursor:not-allowed; }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:8px; padding:16px; margin:14px 0; }
+  .card a{ color:var(--navy); }
+  .card ul{ margin:8px 0 0; padding-left:20px; }
+  .card ul li{ margin-bottom:10px; }
+  .morseGrid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(72px,1fr)); gap:8px; margin-top:12px;
+  }
+  .morseCell{
+    border:1px solid var(--line); border-radius:6px; padding:8px 4px; text-align:center; background:var(--cream);
+    cursor:pointer; transition:background .15s;
+  }
+  .morseCell:hover{ background:var(--tan-light); }
+  .morseCell .letter{ font-size:1.2rem; font-weight:bold; color:var(--navy); }
+  .morseCell .pattern{ font-family:monospace; font-size:1rem; letter-spacing:2px; color:var(--red); margin-top:2px; }
+  .badge{ display:inline-block; padding:2px 10px; border-radius:12px; font-size:0.8rem; font-weight:bold; }
+  .badge.pass{ background:#e3f2e3; color:var(--good); }
+  .badge.fail{ background:#fdecea; color:var(--bad); }
+  .badge.pending{ background:#eee; color:#666; }
+  .timer{ font-size:2rem; font-weight:bold; color:var(--navy); font-family:monospace; }
+  .keybtn{
+    width:100%; padding:40px; font-size:1.2rem; text-align:center; background:var(--red); color:#fff;
+    border-radius:10px; user-select:none; cursor:pointer; margin:14px 0; touch-action:none;
+  }
+  .keybtn.down{ background:#6e0f11; }
+  .decoded{
+    font-family:monospace; font-size:1.1rem; background:#fff; border:1px solid var(--line); border-radius:6px;
+    padding:12px; min-height:60px; white-space:pre-wrap; word-break:break-word;
+  }
+  textarea{ width:100%; min-height:100px; font-family:inherit; font-size:1rem; padding:8px; border:1px solid var(--line); border-radius:4px; }
+  .transcript{ max-height:220px; overflow-y:auto; background:#fff; border:1px solid var(--line); border-radius:6px; padding:10px; font-size:0.95rem; }
+  .transcript .ai{ color:var(--navy); }
+  .transcript .you{ color:var(--red); }
+  .note{ font-size:0.85rem; color:#555; }
+  .result{ font-weight:bold; margin-top:10px; }
+  .locked-msg{ color:#777; font-style:italic; }
+  #certificate{
+    border:10px double var(--tan-dark); background:#fffdf7; padding:40px; text-align:center; margin-top:16px;
+    font-family:'Times New Roman', Georgia, serif;
+  }
+  #certificate h2{ border:none; font-size:1.8rem; color:var(--navy); margin-bottom:0; font-family:'Montserrat', Arial, sans-serif; }
+  #certificate .sub{ letter-spacing:2px; color:var(--red); font-weight:bold; font-family:'Montserrat', Arial, sans-serif; }
+  #certificate .stripImg{ height:38px; width:auto; margin:14px 0; }
+  #certificate .name{ font-size:1.6rem; margin:18px 0 4px; color:var(--red); font-family:'Brush Script MT', cursive, Georgia, serif; }
+  #certificate .line{ border-bottom:1px solid #999; display:inline-block; min-width:220px; }
+  #certificate table{ margin:20px auto; text-align:left; font-family:'Times New Roman', Georgia, serif; }
+  #certificate table td{ padding:3px 10px; }
+  @media print{
+    header, nav, .no-print{ display:none !important; }
+    section{ display:none !important; }
+    section#tab-certificate{ display:block !important; }
+    body{ background:#fff; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><img class="stripIcon" src="data:image/png;base64,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" alt="Morse Code Interpreter Strip"> Morse Code Interpreter Strip — Practice &amp; Test</h1>
+  <div class="who" id="whoHeader">Not set up yet</div>
+</header>
+
+<nav id="tabs">
+  <button data-tab="setup" class="active">Setup</button>
+  <button data-tab="settings">Settings</button>
+  <button data-tab="resources">Resources</button>
+  <button data-tab="conversation">1. Conversation</button>
+  <button data-tab="copy">2. Copy</button>
+  <button data-tab="sending">3. Sending</button>
+  <button data-tab="certificate" id="certTabBtn">Certificate</button>
+</nav>
+
+<main>
+
+  <!-- SETUP -->
+  <section id="tab-setup" class="active">
+    <h2>Scout Setup</h2>
+    <p>Enter your information once. It's saved on this device so you can come back and finish testing later.</p>
+    <label for="scoutName">Scout Name</label>
+    <input type="text" id="scoutName" placeholder="e.g. Robert Baden-Powell">
+    <div class="row">
+      <div>
+        <label for="scoutTroop">Troop / Unit</label>
+        <input type="text" id="scoutTroop" placeholder="e.g. Troop 1">
+      </div>
+      <div>
+        <label for="scoutCouncil">Council</label>
+        <input type="text" id="scoutCouncil" placeholder="e.g. Gilwell Council">
+      </div>
+    </div>
+    <button class="primary" id="saveSetup">Save &amp; Continue</button>
+    <div class="card">
+      <strong>Requirement overview</strong>
+      <p class="note">You must complete all three of the following at a minimum of 5 words per minute (adjustable up to 25 wpm in Settings):</p>
+      <ol>
+        <li>Carry on a 5-minute conversation in Morse code.</li>
+        <li>Correctly copy a 2-minute message sent in Morse code.</li>
+        <li>Send a 25-word written passage in Morse code.</li>
+      </ol>
+      <p class="note">This app is a self-practice / self-test tool. Requirements #2 and #3 are auto-graded here for practice purposes. Requirement #1 (conversation) is timed and logged, but — like most BSA advancement — a unit leader or merit badge counselor should observe or review the transcript to confirm proficiency before the strip is awarded.</p>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings">
+    <h2>Settings</h2>
+    <label for="wpmRange">Code speed: <span id="wpmVal">5</span> words per minute</label>
+    <input type="range" id="wpmRange" min="5" max="25" step="1" value="5">
+    <label for="volRange">Tone volume</label>
+    <input type="range" id="volRange" min="0" max="100" step="5" value="60">
+    <button class="primary" id="testTone">▶ Play test tone (PARIS)</button>
+    <div class="card">
+      <button class="secondary" id="resetProgress">Reset all progress</button>
+      <p class="note">Clears saved profile, settings, and test results from this browser.</p>
+    </div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section id="tab-resources">
+    <h2>Resources</h2>
+    <div class="card">
+      <strong>Morse Code Alphabet</strong>
+      <label for="resWpmRange">Code speed: <span id="resWpmVal">5</span> words per minute</label>
+      <input type="range" id="resWpmRange" min="5" max="25" step="1" value="5">
+      <p class="note">Tap any letter or number to hear it played at the speed above.</p>
+      <button class="secondary" id="playAlphabet">▶ Play the whole alphabet</button>
+      <div class="morseGrid" id="morseGrid"></div>
+
+      <p class="note" style="margin-top:16px;"><strong>Common punctuation</strong></p>
+      <button class="secondary" id="playPunctuation">▶ Play punctuation</button>
+      <div class="morseGrid" id="morseGridPunct"></div>
+    </div>
+    <div class="card">
+      <strong>Learn more</strong>
+      <ul>
+        <li><a href="https://www.arrl.org/files/file/Scouting/morse-code-interpreter-strip-final.pdf" target="_blank" rel="noopener">Official Interpreter Strip requirements (ARRL / BSA PDF)</a> — the source sheet these three tests are built from. Fun fact from the sheet: the strip's own dot-dash pattern spells out M‑O‑R‑S‑E.</li>
+        <li><a href="https://morse.withgoogle.com/learn/" target="_blank" rel="noopener">Google's free interactive Morse code trainer</a> — a game-like way to build speed and muscle memory outside of practice sessions here. Works best on a phone held in landscape mode.</li>
+        <li><a href="https://morsle.fun/" target="_blank" rel="noopener">Morsle</a> — a free daily Morse code puzzle, Wordle-style. A fun, low-pressure way to keep decoding skills sharp between practice sessions.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CONVERSATION -->
+  <section id="tab-conversation">
+    <h2>1. Five-Minute Conversation</h2>
+    <p class="note">The app will play short lines in Morse code — the text is never shown, so you have to copy it by ear, just like a real contact. Use the Notes box to write down what you copy, then key your own reply using the button below or the spacebar (press and hold for dots/dashes, like a telegraph key — you'll hear a tone while it's held down). The session runs for 5 minutes. Send at whatever speed feels natural; the app figures out your dots and dashes on its own.</p>
+    <div class="card">
+      <span>Status: <span id="convBadge" class="badge pending">Not started</span></span>
+      <div class="timer" id="convTimer">05:00</div>
+      <button class="primary" id="convStart">Start Conversation</button>
+      <button class="secondary" id="convStop" style="display:none;">⏹ Stop Conversation</button>
+
+      <div id="convBody" style="display:none;">
+        <p class="note" id="convIncomingNote">🔊 BASE CAMP is sending a line in Morse code. Listen closely — the text won't be shown here.</p>
+        <button class="secondary" id="convReplay">🔁 Replay this line</button>
+
+        <label for="convNotes">Your notes (write down what you're copying):</label>
+        <textarea id="convNotes" placeholder="Jot down what you think each incoming line says as you copy it..."></textarea>
+
+        <div id="convKeyArea" style="display:none;">
+          <label>Your reply — key it in Morse:</label>
+          <div class="keybtn" id="convKeyBtn">HOLD (click/tap) or press-and-hold the SPACEBAR to key a dot/dash — release to end it</div>
+          <div class="decoded" id="convDecoded"></div>
+          <button class="secondary" id="convSendLine">Send this reply</button>
+        </div>
+      </div>
+
+      <div class="transcript" id="convTranscript"></div>
+    </div>
+  </section>
+
+  <!-- COPY -->
+  <section id="tab-copy">
+    <h2>2. Two-Minute Copy Test</h2>
+    <p class="note">A historical Scouting passage will be sent in Morse code (Robert Baden-Powell's writings / Scouting for Boys). As you hear each letter, translate it in your head and type the plain-English word directly into the box below — that's the actual skill this requirement tests. You can pause if you need a moment, and there's no separate "notes" step: what you type in the box is what gets graded.</p>
+    <div class="card">
+      <span>Status: <span id="copyBadge" class="badge pending">Not started</span></span>
+      <button class="primary" id="copyStart">▶ Play Message</button>
+      <button class="secondary" id="copyPause" style="display:none;">⏸ Pause</button>
+      <div class="timer" id="copyTimer" style="display:none;">00:00</div>
+      <label for="copyInput">Type what you copied (plain English, as you decode it):</label>
+      <textarea id="copyInput" placeholder="Start typing the translated words as soon as you hear the message begin..."></textarea>
+      <button class="primary" id="copySubmit" disabled>Submit Copy</button>
+      <div class="result" id="copyResult"></div>
+    </div>
+  </section>
+
+  <!-- SENDING -->
+  <section id="tab-sending">
+    <h2>3. Send a 25-Word Passage</h2>
+    <p class="note">Send the passage below in Morse code using the key or the spacebar. Press and hold for a dot or dash (you'll hear a tone while it's held down); release when done. Pause briefly between letters, and a bit longer between words. Send at whatever speed feels natural — the app measures your actual speed and checks it against the 5 wpm minimum afterward.</p>
+    <div class="card">
+      <strong>Passage to send:</strong>
+      <p id="sendPassage" style="font-style:italic;"></p>
+      <span>Status: <span id="sendBadge" class="badge pending">Not started</span></span>
+      <button class="primary" id="sendStart">Start Sending Test</button>
+      <div id="sendKeyArea" style="display:none;">
+        <p class="note" id="sendPhaseNote">First, calibrate: key the letter <strong>A</strong> (dot-dash, &bull;&ndash;), then pause briefly like you naturally would <strong>between two words</strong>, then key <strong>A</strong> again. Repeat once or twice, then press "Start Message" when ready.</p>
+        <div class="keybtn" id="sendKeyBtn">HOLD (click/tap) or press-and-hold the SPACEBAR to key — release to end the dot/dash</div>
+        <button class="primary" id="sendCalibrateDone">Start Message ▶</button>
+        <div class="decoded" id="sendDecoded"></div>
+        <div class="raw" id="sendRaw" style="font-size:0.85em; opacity:0.75; letter-spacing:1px;"></div>
+        <div class="row" id="sendMessageControls" style="margin-top:8px; display:none;">
+          <button class="secondary" id="sendRestart">↺ Start Over</button>
+          <button class="primary" id="sendFinish">I'm Finished Sending</button>
+        </div>
+        <p class="note" id="sendMistakeNote" style="display:none;">Made a mistake? Click <strong>Start Over</strong> to clear what you've keyed and restart the timing — no need to submit first.</p>
+      </div>
+      <div class="result" id="sendResult"></div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATE -->
+  <section id="tab-certificate">
+    <h2>Certificate</h2>
+    <div id="certLocked" class="locked-msg">Complete all three requirements to unlock your certificate.</div>
+    <div id="certUnlocked" style="display:none;">
+      <div id="certificate">
+        <div class="sub">SCOUTING AMERICA</div>
+        <h2>Morse Code Interpreter Strip</h2>
+        <img class="stripImg" src="data:image/png;base64,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" alt="Morse Code Interpreter Strip insignia">
+        <p>This certifies that</p>
+        <div class="name" id="certName">—</div>
+        <p>of <span id="certTroop">—</span>, <span id="certCouncil">—</span> council,</p>
+        <p>has demonstrated proficiency in Morse Code by completing all requirements below.</p>
+        <table>
+          <tr><td>1. Five-minute conversation</td><td id="certConv">—</td></tr>
+          <tr><td>2. Two-minute copy (accuracy)</td><td id="certCopy">—</td></tr>
+          <tr><td>3. Twenty-five word sending</td><td id="certSend">—</td></tr>
+        </table>
+        <p>Date completed: <span class="line" id="certDate">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+        <p style="margin-top:30px;">Verified by (unit leader / counselor signature): <span class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+      </div>
+      <button class="primary no-print" id="printCert">🖨 Print / Save as PDF</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ============================================================
+   MORSE CODE PRACTICE APP
+   Single-file, no build tools, no server required.
+   Uses localStorage to remember profile/settings/progress on
+   this device/browser only.
+   ============================================================ */
+
+// ---------- Morse alphabet ----------
+const MORSE = {
+  A:'.-', B:'-...', C:'-.-.', D:'-..', E:'.', F:'..-.', G:'--.', H:'....',
+  I:'..', J:'.---', K:'-.-', L:'.-..', M:'--', N:'-.', O:'---', P:'.--.',
+  Q:'--.-', R:'.-.', S:'...', T:'-', U:'..-', V:'...-', W:'.--', X:'-..-',
+  Y:'-.--', Z:'--..',
+  '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-',
+  '5':'.....','6':'-....','7':'--...','8':'---..','9':'----.',
+  '.':'.-.-.-', ',':'--..--', '?':'..--..', "'":'.----.', '-':'-....-', '/':'-..-.',
+  '!':'-.-.--', '"':'.-..-.', '(':'-.--.', ')':'-.--.-', ':':'---...', ';':'-.-.-.',
+  '=':'-...-', '@':'.--.-.'
+};
+const REVERSE_MORSE = {};
+Object.keys(MORSE).forEach(k => REVERSE_MORSE[MORSE[k]] = k);
+
+function textToMorseWords(text){
+  return text.toUpperCase().trim().split(/\s+/).filter(Boolean).map(word =>
+    [...word].map(ch => MORSE[ch]).filter(Boolean)
+  );
+}
+
+// Build a timeline of on/off events (in "units") for a phrase.
+function buildTimeline(text){
+  const words = textToMorseWords(text);
+  const events = [];
+  words.forEach((letters, wi) => {
+    letters.forEach((code, li) => {
+      [...code].forEach((sym, si) => {
+        events.push({on:true, units: sym==='.' ? 1 : 3});
+        if(si < code.length-1) events.push({on:false, units:1});
+      });
+      if(li < letters.length-1) events.push({on:false, units:3});
+    });
+    if(wi < words.length-1) events.push({on:false, units:7});
+  });
+  return events;
+}
+
+// ---------- Audio playback ----------
+let audioCtx = null;
+function getCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+// Tracks whatever playText() call is currently sounding, so a new call can
+// cut it off cleanly instead of overlapping (e.g. hitting "Play test tone"
+// again, or changing the speed slider mid-playback and pressing play again).
+let currentPlayback = null;
+
+function playText(text, wpm, volume){
+  // Stop whatever's currently playing before starting the new one.
+  if(currentPlayback){ currentPlayback.stop(); currentPlayback = null; }
+
+  return new Promise(resolve => {
+    const ctx = getCtx();
+    const events = buildTimeline(text);
+    const unitSec = 1.2/wpm; // standard PARIS timing: unit(ms) = 1200/wpm
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = 620;
+    gain.gain.value = 0.0001;
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    let t = ctx.currentTime + 0.15;
+    const vol = Math.max(0.0001, volume/100 * 0.35);
+    events.forEach(ev => {
+      const dur = ev.units * unitSec;
+      if(ev.on){
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.setValueAtTime(0.0001, t + Math.max(dur-0.008, 0.001));
+      }
+      t += dur;
+    });
+    osc.stop(t + 0.05);
+
+    let settled = false;
+    let paused = false;
+    // AudioContext.suspend()/resume() freeze and resume all scheduled gain
+    // automation exactly where it left off, so pausing doesn't need to
+    // re-schedule the tone timeline — but the completion timer is wall-clock
+    // (setTimeout), so it has to be tracked/restarted around the pause too.
+    let remainingMs = (t - ctx.currentTime) * 1000;
+    let segmentStartedAt = Date.now();
+    let timer = setTimeout(finish, remainingMs);
+
+    function finish(){
+      if(settled) return;
+      settled = true;
+      currentPlayback = null;
+      resolve();
+    }
+
+    currentPlayback = {
+      stop(){
+        if(settled) return;
+        settled = true;
+        clearTimeout(timer);
+        try{
+          gain.gain.cancelScheduledValues(ctx.currentTime);
+          gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.02);
+        }catch(e){ /* already stopped */ }
+        resolve();
+      },
+      pause(){
+        if(settled || paused) return;
+        paused = true;
+        remainingMs -= (Date.now() - segmentStartedAt);
+        clearTimeout(timer);
+        ctx.suspend();
+      },
+      resume(){
+        if(settled || !paused) return;
+        paused = false;
+        ctx.resume();
+        segmentStartedAt = Date.now();
+        timer = setTimeout(finish, Math.max(remainingMs, 0));
+      },
+      isPaused(){ return paused; }
+    };
+  });
+}
+
+// Force-stops any Morse audio currently playing (used by the Stop Conversation
+// button, so ending the test early doesn't leave a line playing in the background).
+function stopCurrentPlayback(){
+  if(currentPlayback){ currentPlayback.stop(); currentPlayback = null; }
+}
+
+function pauseCurrentPlayback(){ if(currentPlayback) currentPlayback.pause(); }
+function resumeCurrentPlayback(){ if(currentPlayback) currentPlayback.resume(); }
+function isCurrentPlaybackPaused(){ return !!currentPlayback && currentPlayback.isPaused(); }
+
+// ---------- Sidetone (audio feedback while keying, like a real telegraph/CW key) ----------
+function makeSidetone(getVolume){
+  let ctx=null, osc=null, gain=null;
+  function ensure(){
+    if(!ctx){
+      ctx = getCtx();
+      osc = ctx.createOscillator();
+      gain = ctx.createGain();
+      osc.frequency.value = 620;
+      gain.gain.value = 0.0001;
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+    }
+  }
+  function on(){
+    ensure();
+    const vol = Math.max(0.0001, getVolume()/100 * 0.35);
+    gain.gain.cancelScheduledValues(ctx.currentTime);
+    gain.gain.setTargetAtTime(vol, ctx.currentTime, 0.005);
+  }
+  function off(){
+    if(!ctx) return;
+    gain.gain.cancelScheduledValues(ctx.currentTime);
+    gain.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.01);
+  }
+  function stop(){
+    if(osc){ try{ osc.stop(); }catch(e){} }
+    osc=null; gain=null; ctx=null;
+  }
+  return { on, off, stop };
+}
+
+// ---------- Key input (press-and-hold telegraph key, mouse/touch/spacebar) ----------
+// Used by both the conversation and sending tests.
+//
+// This does NOT assume the Scout is keying at the Settings wpm. Instead it
+// records the raw duration of every press, then figures out which durations
+// are "short" (dots) and which are "long" (dashes) using simple clustering.
+// Calibration is based on a SLIDING WINDOW of the most recent presses (not
+// the whole message) so the decoder tracks the sender's *current* speed —
+// real people speed up, slow down, and pause unevenly as they go, and a
+// whole-message average gets stale and misreads everything once speed
+// drifts. The window is seeded with a couple of placeholder "assumed dot"
+// values at the Settings speed, so an early keystroke that happens to be a
+// dash can't badly skew the very first few letters before real data arrives.
+//
+// Pauses are judged relative to that same recency-weighted unit estimate,
+// using boundary ratios a bit more forgiving than the textbook 1:3:7 unit
+// spacing: hand-sent pauses between words are often shorter than "ideal"
+// spacing, especially for beginners, so a strict threshold misses real word
+// breaks and runs words together. (An earlier version of this tried
+// clustering the gaps themselves into three groups instead of using fixed
+// ratios — it turned out to be more fragile under simultaneous speed drift,
+// since a word-gap and character-gap cluster can end up too close together
+// to separate reliably. The simple ratio approach below tracks drift fine
+// already, since it's a multiple of the same live-updating unit estimate.)
+//
+// Display only ever grows: a letter is decided ONCE — the moment a pause
+// confirms it's finished — using the best calibration available at that
+// instant, and is then locked in and never re-evaluated. Nothing is shown
+// mid-letter, so already-displayed text never changes or flickers as more
+// of the message comes in.
+function makeKeyInput(getWpm){
+  const WINDOW_SIZE = 12; // recent presses used for calibration
+  const state = { down:false, downAt:0, upAt:0, durationWindow:[], pendingDurations:[], text:'', rawText:'', pollTimer:null, calibrating:false, maxCalGap:0 };
+
+  // A Scout's real "let me think of the next letter" pause between letters
+  // doesn't shrink just because the Settings speed is set higher — it's
+  // roughly constant in real seconds. That means a purely proportional
+  // word-gap threshold (a fixed multiple of the dot length) can misread an
+  // ordinary hesitation as "must be a new word," especially at faster
+  // Settings speeds where the unit is tiny. Testing this directly (a
+  // simulated beginner who pauses a few times longer between letters while
+  // recalling each one) reproduced exactly that: whole messages shattered
+  // into one-letter "words".
+  //
+  // Fix: during the calibration tap (Scout keys "A", pauses like they would
+  // between two words, then keys "A" again), we measure that demonstrated
+  // pause directly and let it RAISE the word-break threshold above the
+  // default — but never lower it. Only raising it means a Scout whose own
+  // natural word-pause is clearly longer than the safe default gets more
+  // headroom against false word-breaks, while a Scout who didn't pause much
+  // (or skipped calibration) still gets the proven-reliable default rather
+  // than a threshold weakened by one noisy sample.
+  let calibratedWordGap = null;
+  function startCalibrating(){ state.calibrating = true; state.maxCalGap = 0; }
+  function endCalibrating(){
+    state.calibrating = false;
+    if(state.maxCalGap > 0) calibratedWordGap = state.maxCalGap;
+  }
+
+  // Deliberately NOT pre-seeded with a placeholder duration: if the Settings
+  // wpm differs a lot from the sender's actual speed, a fake sample can bias
+  // classification of the first several real keystrokes in the wrong
+  // direction (e.g. sending slower than Settings makes real dots look like
+  // dashes next to an artificially fast placeholder). Leaving the window
+  // empty means the very first keystroke is judged only against the
+  // Settings-derived guess as a one-time fallback (see twoMeans below), and
+  // every keystroke after that is calibrated purely from real data.
+  function seedWindow(){
+    state.durationWindow = [];
+  }
+  seedWindow();
+
+  // Damped estimate of the current dot-length, used ONLY for judging
+  // char/word pause boundaries (see currentUnit below). It updates once per
+  // real keystroke rather than snapping straight to the latest raw cluster
+  // mean, so a short unlucky run of fast (or slow) real presses can't swing
+  // the pause thresholds enough to misread a letter-gap as a word-gap —
+  // testing showed exactly that: with realistic hand jitter, an ordinary
+  // letter-to-letter gap could occasionally land just past the word-gap
+  // ratio because the raw per-keystroke unit estimate is noisy on its own.
+  let smoothedUnit = null;
+  function pushDuration(dur){
+    state.durationWindow.push(dur);
+    if(state.durationWindow.length > WINDOW_SIZE) state.durationWindow.shift();
+    const raw = twoMeans(state.durationWindow).dot;
+    smoothedUnit = (smoothedUnit === null) ? raw : smoothedUnit*0.65 + raw*0.35;
+  }
+
+  // 1-D "2-means" clustering: splits recent press durations into a short
+  // (dot) group and a long (dash) group, regardless of absolute speed.
+  //
+  // IMPORTANT: clustering alone cannot tell short from long without some
+  // *contrast* in the sample — a run of same-length presses (e.g. testing a
+  // dash-only letter like "T" or "O" by itself) is equally consistent with
+  // "these are all dots" or "these are all dashes." Naively assuming
+  // "whatever I've seen so far must be a dot" (the old behavior here) meant
+  // a single press was ALWAYS read as a dot no matter how long it was held.
+  // So: when there isn't enough spread in the data to safely trust
+  // clustering, fall back to the Settings-implied absolute timing to decide
+  // whether the uniform cluster looks more like dots or dashes, instead of
+  // blindly labeling it "dot".
+  function twoMeans(durations){
+    const seed = 1200/getWpm();
+    if(durations.length === 0) return { dot: seed, dash: seed*3 };
+    let dot = Math.min(...durations);
+    let dash = Math.max(...durations);
+    for(let i=0;i<8;i++){
+      const dotGroup=[], dashGroup=[];
+      durations.forEach(d => (Math.abs(d-dot) <= Math.abs(d-dash) ? dotGroup : dashGroup).push(d));
+      if(dotGroup.length) dot = dotGroup.reduce((a,b)=>a+b,0)/dotGroup.length;
+      if(dashGroup.length) dash = dashGroup.reduce((a,b)=>a+b,0)/dashGroup.length;
+    }
+    if(dash < dot * 1.8){
+      // Not enough contrast to trust the split above — decide against the
+      // absolute Settings-implied unit instead of assuming "dot".
+      const uniform = (dot + dash) / 2;
+      if(uniform < seed * 2){
+        dot = uniform; dash = seed * 3;
+      } else {
+        dot = seed; dash = uniform;
+      }
+    }
+    return { dot, dash };
+  }
+
+  function currentUnit(){ return smoothedUnit === null ? twoMeans(state.durationWindow).dot : smoothedUnit; }
+
+  // Debounce: mice, trackpads, and touchscreens occasionally misfire a
+  // spurious extra down/up blip around a single real click — the same
+  // "switch bounce" problem hardware debounce circuits exist to solve for
+  // noisy analog contacts. A press, or the gap right after a release, this
+  // short is physically impossible to send intentionally even at the
+  // fastest supported speed (25 wpm => a dot is ~48ms), so anything under
+  // this is treated as contact noise and dropped rather than fed to the
+  // decoder as a (very wrong) extra dot.
+  const DEBOUNCE_MS = 15;
+
+  function keyDown(){
+    if(state.down) return;
+    const now = performance.now();
+    if(state.upAt && (now - state.upAt) < DEBOUNCE_MS) return; // bounce right after release — ignore
+    state.down = true;
+    if(state.upAt){
+      const gap = now - state.upAt;
+      const unit = currentUnit();
+      if(state.calibrating) state.maxCalGap = Math.max(state.maxCalGap, gap);
+      const defaultWordThresh = unit*4.2;
+      const wordThresh = calibratedWordGap !== null ? Math.max(defaultWordThresh, calibratedWordGap*0.75) : defaultWordThresh;
+      if(gap >= wordThresh){
+        finalizePending();
+        state.text += ' ';
+        state.rawText += ' / ';
+      } else if(gap >= unit*2){
+        finalizePending();
+      }
+      // else: intra-character gap — keep accumulating the same letter
+    }
+    state.downAt = now;
+  }
+
+  function keyUp(){
+    if(!state.down) return;
+    state.down = false;
+    const now = performance.now();
+    const dur = now - state.downAt;
+    if(dur < DEBOUNCE_MS){
+      // Spurious blip too short to be a real press — discard it without
+      // recording a duration or moving the release-time anchor, so gap
+      // timing for the next real press is unaffected.
+      return;
+    }
+    pushDuration(dur);
+    state.pendingDurations.push(dur);
+    state.upAt = now;
+  }
+
+  // Locks in the letter currently being keyed. Uses the best calibration
+  // available right now, then never revisits this decision.
+  function finalizePending(){
+    if(state.pendingDurations.length === 0) return;
+    const { dot, dash } = twoMeans(state.durationWindow);
+    const symbols = state.pendingDurations.map(d => (Math.abs(d-dot) <= Math.abs(d-dash) ? '.' : '-')).join('');
+    state.text += (REVERSE_MORSE[symbols] || '?');
+    state.rawText += (state.rawText && !state.rawText.endsWith(' ') ? ' ' : '') + symbols;
+    state.pendingDurations = [];
+  }
+
+  function displayString(){ return state.text; }
+  // Shows exactly what the app measured as dots/dashes, letter-by-letter —
+  // lets a Scout (or leader) see whether a specific press was read as the
+  // wrong symbol, instead of only seeing the final decoded letters.
+  function rawString(){ return state.rawText; }
+
+  function startPolling(onUpdate){
+    stopPolling();
+    state.pollTimer = setInterval(() => {
+      // auto-finalize a trailing letter if the key has been idle long enough
+      if(!state.down && state.upAt && state.pendingDurations.length){
+        const gap = performance.now() - state.upAt;
+        if(gap >= currentUnit()*2) finalizePending();
+      }
+      onUpdate(displayString());
+    }, 150);
+  }
+  function stopPolling(){ if(state.pollTimer) clearInterval(state.pollTimer); state.pollTimer = null; }
+
+  function reset(){ state.down=false; state.downAt=0; state.upAt=0; seedWindow(); smoothedUnit=null; calibratedWordGap=null; state.calibrating=false; state.maxCalGap=0; state.pendingDurations=[]; state.text=''; state.rawText=''; }
+  function finalizeNow(){ finalizePending(); }
+  // Clears decoded text/pending strokes WITHOUT wiping the calibrated
+  // durationWindow — used when moving from a practice/calibration tap into
+  // the graded message, or on "Start Over", so the speed contrast already
+  // learned isn't thrown away.
+  function clearText(){ state.pendingDurations=[]; state.text=''; state.rawText=''; state.upAt=0; }
+
+  return { keyDown, keyUp, startPolling, stopPolling, reset, finalizeNow, clearText, state, displayString, rawString, startCalibrating, endCalibrating };
+}
+
+// ---------- Persistence ----------
+const STORAGE_KEY = 'morseAppState_v1';
+function loadState(){
+  try{
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  }catch(e){ return {}; }
+}
+function saveState(patch){
+  const s = Object.assign(loadState(), patch);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+  return s;
+}
+let appState = loadState();
+
+// ---------- Scout / Baden-Powell quote bank ----------
+// NOTE FOR TROOP LEADERS: these lines are written in the spirit of Robert
+// Baden-Powell's Scouting writings (public domain, e.g. "Scouting for Boys",
+// 1908, and his 1941 Farewell Message). Wording is paraphrased for reliable
+// exact-word-count matching in the app. For official/ceremonial use, feel
+// free to swap in verbatim text you've verified against a primary source.
+const QUOTE_BANK = [
+  "Try and leave this world a little better than you found it and when your turn comes to die you can die happy in feeling that you have not wasted your time but have done your best",
+  "A Scout smiles and whistles under all circumstances even when things go wrong and life feels difficult that is the mark of a true Scout spirit worth carrying every single day",
+  "Character is the sum total of a habit formed through daily choices and Scouting builds that character one small honest action at a time in camp and at home",
+  "Be prepared is the Scout motto and its meaning is that a Scout must prepare himself by previous thinking out and practicing how to act on any accident or emergency",
+  "Scouting is a game for boys and girls under the leadership of older friends who guide them toward good citizenship self reliance and service to others in their community",
+  "The most worthwhile things in life are the hardest to achieve and a Scout learns patience skill and courage by practicing them again and again until they become second nature",
+  "Self education and not education handed down by others is what our young people truly need and Scouting gives every young person the chance to teach themselves through doing",
+  "A Scout's duty is to be useful and to help others especially those nearest at hand at home in camp and wherever the need for a helping hand appears"
+];
+
+function wordsForWpm(wpm){
+  // roughly a 2-minute message: words = wpm * 2
+  return Math.max(8, Math.round(wpm * 2));
+}
+function buildCopyMessage(wpm){
+  const pool = QUOTE_BANK.join(' ').split(/\s+/);
+  const startMax = Math.max(0, pool.length - wordsForWpm(wpm));
+  const start = Math.floor(Math.random() * (startMax+1));
+  return pool.slice(start, start + wordsForWpm(wpm)).join(' ');
+}
+const SENDING_PASSAGE = (function(){
+  const words = QUOTE_BANK[0].split(/\s+/).concat(QUOTE_BANK[3].split(/\s+/));
+  return words.slice(0,25).join(' ');
+})();
+
+const CONV_SCRIPT = [
+  "HELLO SCOUT THIS IS BASE CAMP DO YOU COPY",
+  "WHAT IS YOUR NAME",
+  "WHAT TROOP ARE YOU FROM",
+  "WHAT IS THE SCOUT MOTTO",
+  "HOW IS THE WEATHER WHERE YOU ARE",
+  "WHAT IS YOUR FAVORITE SCOUTING ACTIVITY",
+  "GOOD COPY THANK YOU FOR THE CONTACT",
+  "WHAT BADGE ARE YOU WORKING ON NEXT",
+  "SEND YOUR TROOP NUMBER ONE MORE TIME",
+  "THIS HAS BEEN A GREAT CONTACT SEE YOU NEXT TIME",
+  "BASE CAMP OUT AND CLEAR",
+  "SEND ANY FINAL MESSAGE YOU WOULD LIKE"
+];
+
+// ============================================================
+// UI WIRING
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // ----- Tabs -----
+  const tabButtons = document.querySelectorAll('#tabs button');
+  tabButtons.forEach(btn => btn.addEventListener('click', () => {
+    const newTab = btn.dataset.tab;
+    const current = document.querySelector('#tabs button.active')?.dataset.tab;
+    if(current && current !== newTab) stopActiveTabProcesses(current);
+    showTab(newTab);
+  }));
+  function showTab(name){
+    tabButtons.forEach(b => b.classList.toggle('active', b.dataset.tab===name));
+    document.querySelectorAll('main > section').forEach(s => s.classList.remove('active'));
+    document.getElementById('tab-'+name).classList.add('active');
+  }
+
+  // ----- Setup -----
+  const scoutName = document.getElementById('scoutName');
+  const scoutTroop = document.getElementById('scoutTroop');
+  const scoutCouncil = document.getElementById('scoutCouncil');
+  scoutName.value = appState.name || '';
+  scoutTroop.value = appState.troop || '';
+  scoutCouncil.value = appState.council || '';
+  updateHeader();
+
+  document.getElementById('saveSetup').addEventListener('click', () => {
+    appState = saveState({ name: scoutName.value.trim(), troop: scoutTroop.value.trim(), council: scoutCouncil.value.trim() });
+    updateHeader();
+    showTab('settings');
+  });
+
+  function updateHeader(){
+    const h = document.getElementById('whoHeader');
+    if(appState.name) h.textContent = appState.name + (appState.troop ? ' — '+appState.troop : '');
+    else h.textContent = 'Not set up yet';
+  }
+
+  // ----- Settings -----
+  const wpmRange = document.getElementById('wpmRange');
+  const wpmVal = document.getElementById('wpmVal');
+  const volRange = document.getElementById('volRange');
+  // The Resources tab has its own speed slider (for auditioning alphabet
+  // letters at different speeds) that stays in sync with this one — both
+  // just read/write the same appState.wpm value.
+  const resWpmRange = document.getElementById('resWpmRange');
+  const resWpmVal = document.getElementById('resWpmVal');
+  wpmRange.value = appState.wpm || 5;
+  wpmVal.textContent = wpmRange.value;
+  resWpmRange.value = wpmRange.value;
+  resWpmVal.textContent = wpmRange.value;
+  volRange.value = appState.volume != null ? appState.volume : 60;
+  function setWpm(v){
+    wpmRange.value = v; wpmVal.textContent = v;
+    resWpmRange.value = v; resWpmVal.textContent = v;
+    appState = saveState({ wpm: Number(v) });
+  }
+  wpmRange.addEventListener('input', () => setWpm(wpmRange.value));
+  resWpmRange.addEventListener('input', () => setWpm(resWpmRange.value));
+  volRange.addEventListener('input', () => { appState = saveState({ volume: Number(volRange.value) }); });
+  function currentWpm(){ return Number(wpmRange.value); }
+  function currentVol(){ return Number(volRange.value); }
+
+  // Shared sidetone: the audible "beep" heard while a key is held down,
+  // used by both the conversation and sending key inputs below.
+  const keySidetone = makeSidetone(currentVol);
+
+  document.getElementById('testTone').addEventListener('click', () => {
+    playText('PARIS', currentWpm(), currentVol());
+  });
+
+  document.getElementById('resetProgress').addEventListener('click', () => {
+    if(confirm('Clear all saved profile, settings, and results on this device?')){
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+  });
+
+  // ----- Resources: Morse alphabet reference -----
+  const ALPHABET_ORDER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+  const morseGrid = document.getElementById('morseGrid');
+  ALPHABET_ORDER.forEach(ch => {
+    const cell = document.createElement('div');
+    cell.className = 'morseCell';
+    cell.innerHTML = '<div class="letter">'+ch+'</div><div class="pattern">'+MORSE[ch]+'</div>';
+    cell.title = 'Tap to hear ' + ch;
+    cell.addEventListener('click', () => playText(ch, currentWpm(), currentVol()));
+    morseGrid.appendChild(cell);
+  });
+  document.getElementById('playAlphabet').addEventListener('click', () => {
+    playText(ALPHABET_ORDER.join(' '), currentWpm(), currentVol());
+  });
+
+  const PUNCT_ORDER = ['.', ',', '?', '!', "'", '"', '-', '/', ':', ';', '(', ')', '='];
+  const morseGridPunct = document.getElementById('morseGridPunct');
+  const PUNCT_NAMES = { '.':'period', ',':'comma', '?':'question mark', '!':'exclamation point',
+    "'":'apostrophe', '"':'quotation mark', '-':'hyphen', '/':'slash', ':':'colon', ';':'semicolon',
+    '(':'open parenthesis', ')':'close parenthesis', '=':'equals (break)' };
+  PUNCT_ORDER.forEach(ch => {
+    const cell = document.createElement('div');
+    cell.className = 'morseCell';
+    cell.innerHTML = '<div class="letter">'+ch+'</div><div class="pattern">'+MORSE[ch]+'</div>';
+    cell.title = 'Tap to hear ' + (PUNCT_NAMES[ch] || ch);
+    cell.addEventListener('click', () => playText(ch, currentWpm(), currentVol()));
+    morseGridPunct.appendChild(cell);
+  });
+  document.getElementById('playPunctuation').addEventListener('click', () => {
+    playText(PUNCT_ORDER.join(' '), currentWpm(), currentVol());
+  });
+
+  // ----- Requirement badges -----
+  function setBadge(id, state, text){
+    const el = document.getElementById(id);
+    el.className = 'badge ' + state;
+    el.textContent = text;
+  }
+  function refreshBadges(){
+    const s = loadState();
+    if(s.convResult) setBadge('convBadge', s.convResult.pass ? 'pass' : 'fail', s.convResult.pass ? 'Completed' : 'Incomplete');
+    if(s.copyResult) setBadge('copyBadge', s.copyResult.pass ? 'pass' : 'fail', s.copyResult.pass ? 'Passed ('+s.copyResult.accuracy+'%)' : 'Try again ('+s.copyResult.accuracy+'%)');
+    if(s.sendResult) setBadge('sendBadge', s.sendResult.pass ? 'pass' : 'fail', s.sendResult.pass ? 'Passed' : 'Try again');
+    updateCertificate();
+  }
+  refreshBadges();
+
+  // =========================================================
+  // 1. CONVERSATION TEST
+  // =========================================================
+  const convTimerEl = document.getElementById('convTimer');
+  const convTranscript = document.getElementById('convTranscript');
+  const convBody = document.getElementById('convBody');
+  const convIncomingNote = document.getElementById('convIncomingNote');
+  const convReplay = document.getElementById('convReplay');
+  const convNotes = document.getElementById('convNotes');
+  const convKeyArea = document.getElementById('convKeyArea');
+  const convKeyBtn = document.getElementById('convKeyBtn');
+  const convDecoded = document.getElementById('convDecoded');
+  let convInterval = null, convSecondsLeft = 300, convScriptIndex = 0, convExchanges = 0, currentAiLine = '', convPlaying = false, convActive = false;
+  const convKey = makeKeyInput(currentWpm);
+  const convStartBtn = document.getElementById('convStart');
+  const convStopBtn = document.getElementById('convStop');
+
+  function logLine(cls, text){
+    const p = document.createElement('div');
+    p.className = cls;
+    p.textContent = (cls==='ai' ? 'BASE CAMP: ' : 'YOU: ') + text;
+    convTranscript.appendChild(p);
+    convTranscript.scrollTop = convTranscript.scrollHeight;
+  }
+
+  convStartBtn.addEventListener('click', async () => {
+    convActive = true;
+    convStartBtn.style.display = 'none';
+    convStopBtn.style.display = 'inline-block';
+    convTranscript.innerHTML = '';
+    convNotes.value = '';
+    convBody.style.display = 'block';
+    convSecondsLeft = 300; convScriptIndex = 0; convExchanges = 0;
+    tickConvTimer();
+    convInterval = setInterval(tickConvTimer, 1000);
+    await playNextAiLine();
+  });
+
+  convStopBtn.addEventListener('click', () => finishConversation());
+
+  function tickConvTimer(){
+    convSecondsLeft--;
+    const m = String(Math.max(0,Math.floor(convSecondsLeft/60))).padStart(2,'0');
+    const sec = String(Math.max(0,convSecondsLeft%60)).padStart(2,'0');
+    convTimerEl.textContent = m+':'+sec;
+    if(convSecondsLeft <= 0){
+      finishConversation();
+    }
+  }
+
+  async function playNextAiLine(){
+    if(!convActive || convSecondsLeft <= 0) return;
+    currentAiLine = CONV_SCRIPT[convScriptIndex % CONV_SCRIPT.length];
+    convScriptIndex++;
+    logLine('ai', '🔊 (Morse line sent — copy it by ear, not shown here)');
+    convKeyArea.style.display = 'none';
+    await playCurrentLine();
+  }
+
+  async function playCurrentLine(){
+    if(!convActive || !currentAiLine) return;
+    convPlaying = true;
+    convReplay.disabled = true;
+    convIncomingNote.textContent = '🔊 Sending now — listen closely...';
+    await playText(currentAiLine, currentWpm(), currentVol());
+    if(!convActive) return; // conversation was stopped while this line was playing
+    convPlaying = false;
+    convReplay.disabled = false;
+    convIncomingNote.textContent = '✅ Line finished. Replay it if you need to, then key your reply below.';
+    if(convSecondsLeft > 0){
+      convKeyArea.style.display = 'block';
+      convKey.reset();
+      convDecoded.textContent = '';
+      convKey.startPolling(str => convDecoded.textContent = str);
+    }
+  }
+
+  convReplay.addEventListener('click', () => { if(convActive && !convPlaying) playCurrentLine(); });
+
+  convKeyBtn.addEventListener('mousedown', () => { convKeyBtn.classList.add('down'); convKey.keyDown(); keySidetone.on(); });
+  convKeyBtn.addEventListener('mouseup', () => { convKeyBtn.classList.remove('down'); convKey.keyUp(); keySidetone.off(); });
+  convKeyBtn.addEventListener('mouseleave', () => { if(convKeyBtn.classList.contains('down')){ convKeyBtn.classList.remove('down'); convKey.keyUp(); keySidetone.off(); } });
+  convKeyBtn.addEventListener('touchstart', e => { e.preventDefault(); convKeyBtn.classList.add('down'); convKey.keyDown(); keySidetone.on(); });
+  convKeyBtn.addEventListener('touchend', e => { e.preventDefault(); convKeyBtn.classList.remove('down'); convKey.keyUp(); keySidetone.off(); });
+
+  document.getElementById('convSendLine').addEventListener('click', async () => {
+    if(!convActive) return;
+    convKey.finalizeNow();
+    convKey.stopPolling();
+    const said = convKey.state.text.trim();
+    logLine('you', (said || '(no reply keyed)'));
+    convKeyArea.style.display = 'none';
+    convExchanges++;
+    if(convSecondsLeft > 0) await playNextAiLine();
+  });
+
+  function finishConversation(){
+    if(!convActive) return; // already finished/stopped
+    const stoppedEarly = convSecondsLeft > 0;
+    convActive = false;
+    stopCurrentPlayback();
+    clearInterval(convInterval);
+    convKeyArea.style.display = 'none';
+    convBody.style.display = 'none';
+    convKey.stopPolling();
+    keySidetone.stop();
+    convStartBtn.disabled = false;
+    convStartBtn.style.display = '';
+    convStopBtn.style.display = 'none';
+    const notes = convNotes.value.trim();
+    const pass = convExchanges >= 4; // reasonable participation across the 5 minutes
+    appState = saveState({ convResult: { pass, exchanges: convExchanges, notes, date: new Date().toISOString() } });
+    setBadge('convBadge', pass ? 'pass' : 'fail', pass ? 'Completed' : 'Incomplete — practice again');
+    if(notes) logLine('you', '📝 Final notes: ' + notes);
+    logLine('ai', stoppedEarly
+      ? '--- Conversation ended early. Review this transcript (and the notes above) with your unit leader or counselor. ---'
+      : '--- 5 minutes complete. Review this transcript (and the notes above) with your unit leader or counselor. ---');
+    updateCertificate();
+  }
+
+  // =========================================================
+  // 2. COPY TEST
+  // =========================================================
+  let copyMessage = '';
+  const copyTimerEl = document.getElementById('copyTimer');
+  let copyInterval = null, copySecondsElapsed = 0;
+
+  const copyPauseBtn = document.getElementById('copyPause');
+
+  function startCopyTimer(){
+    copyInterval = setInterval(() => {
+      copySecondsElapsed++;
+      const m = String(Math.floor(copySecondsElapsed/60)).padStart(2,'0');
+      const s = String(copySecondsElapsed%60).padStart(2,'0');
+      copyTimerEl.textContent = m+':'+s;
+    }, 1000);
+  }
+
+  document.getElementById('copyStart').addEventListener('click', async () => {
+    const btn = document.getElementById('copyStart');
+    btn.disabled = true;
+    document.getElementById('copyInput').value = '';
+    document.getElementById('copyResult').textContent = '';
+    copyMessage = buildCopyMessage(currentWpm());
+    copySecondsElapsed = 0;
+    copyTimerEl.style.display = 'block';
+    copyTimerEl.textContent = '00:00';
+    copyPauseBtn.style.display = 'inline-block';
+    copyPauseBtn.textContent = '⏸ Pause';
+    startCopyTimer();
+    await playText(copyMessage, currentWpm(), currentVol());
+    clearInterval(copyInterval);
+    copyPauseBtn.style.display = 'none';
+    btn.disabled = false;
+    document.getElementById('copySubmit').disabled = false;
+  });
+
+  copyPauseBtn.addEventListener('click', () => {
+    if(isCurrentPlaybackPaused()){
+      resumeCurrentPlayback();
+      startCopyTimer();
+      copyPauseBtn.textContent = '⏸ Pause';
+    } else {
+      pauseCurrentPlayback();
+      clearInterval(copyInterval);
+      copyPauseBtn.textContent = '▶ Resume';
+    }
+  });
+
+  document.getElementById('copySubmit').addEventListener('click', () => {
+    const typed = document.getElementById('copyInput').value.toUpperCase().replace(/[^A-Z0-9\s]/g,'').split(/\s+/).filter(Boolean);
+    const truth = copyMessage.toUpperCase().split(/\s+/).filter(Boolean);
+    let correct = 0;
+    const len = Math.max(truth.length, typed.length);
+    for(let i=0;i<truth.length;i++){ if(typed[i] === truth[i]) correct++; }
+    const accuracy = truth.length ? Math.round((correct/truth.length)*100) : 0;
+    const pass = accuracy >= 80;
+    appState = saveState({ copyResult: { pass, accuracy, date: new Date().toISOString() } });
+    setBadge('copyBadge', pass ? 'pass' : 'fail', pass ? 'Passed ('+accuracy+'%)' : 'Try again ('+accuracy+'%)');
+    document.getElementById('copyResult').innerHTML =
+      'Accuracy: '+accuracy+'% (need 80%+ to pass)<br>Correct message: <em>'+copyMessage+'</em>';
+    document.getElementById('copySubmit').disabled = true;
+    updateCertificate();
+  });
+
+  // =========================================================
+  // 3. SENDING TEST
+  // =========================================================
+  document.getElementById('sendPassage').textContent = SENDING_PASSAGE;
+  const sendKeyArea = document.getElementById('sendKeyArea');
+  const sendKeyBtn = document.getElementById('sendKeyBtn');
+  const sendDecoded = document.getElementById('sendDecoded');
+  const sendRaw = document.getElementById('sendRaw');
+  const sendKey = makeKeyInput(currentWpm);
+  let sendStartTime = 0;
+
+  const sendPhaseNote = document.getElementById('sendPhaseNote');
+  const sendMistakeNote = document.getElementById('sendMistakeNote');
+  const sendCalibrateDone = document.getElementById('sendCalibrateDone');
+  const sendMessageControls = document.getElementById('sendMessageControls');
+
+  function updateSendDisplay(){
+    sendDecoded.textContent = sendKey.displayString();
+    sendRaw.textContent = sendKey.rawString();
+  }
+
+  function enterCalibrationPhase(){
+    sendPhaseNote.style.display = 'block';
+    sendMistakeNote.style.display = 'none';
+    sendCalibrateDone.style.display = 'inline-block';
+    sendMessageControls.style.display = 'none';
+  }
+  function enterMessagePhase(){
+    sendPhaseNote.style.display = 'none';
+    sendMistakeNote.style.display = 'block';
+    sendCalibrateDone.style.display = 'none';
+    sendMessageControls.style.display = 'flex';
+  }
+
+  document.getElementById('sendStart').addEventListener('click', () => {
+    document.getElementById('sendStart').disabled = true;
+    sendKeyArea.style.display = 'block';
+    sendKey.reset();
+    sendKey.startCalibrating();
+    updateSendDisplay();
+    enterCalibrationPhase();
+    // Live decode during calibration too, so tapping "A" (•–) gives
+    // immediate visual confirmation — both the decoded letter and the raw
+    // dot/dash pattern the app actually measured — before grading starts.
+    sendKey.startPolling(updateSendDisplay);
+  });
+
+  // Calibration taps (e.g. "A" = dot-dash) feed real durations into the
+  // decoder's window before grading starts, so it has dot/dash contrast
+  // from the very first character of the graded message — this is what
+  // fixes the "first letter guessed wrong" issue seen with a cold start.
+  // The demonstrated pause between the two "A"s is also captured (see
+  // endCalibrating/makeKeyInput) and can only make the word-break threshold
+  // MORE forgiving than the safe default, never less — so it helps Scouts
+  // who naturally pause longer while thinking, without risking false word
+  // breaks for everyone else.
+  sendCalibrateDone.addEventListener('click', () => {
+    sendKey.finalizeNow();
+    sendKey.endCalibrating();
+    sendKey.clearText();
+    updateSendDisplay();
+    sendStartTime = performance.now();
+    enterMessagePhase();
+    sendKey.startPolling(updateSendDisplay);
+  });
+
+  sendKeyBtn.addEventListener('mousedown', () => { sendKeyBtn.classList.add('down'); sendKey.keyDown(); keySidetone.on(); });
+  sendKeyBtn.addEventListener('mouseup', () => { sendKeyBtn.classList.remove('down'); sendKey.keyUp(); keySidetone.off(); });
+  sendKeyBtn.addEventListener('mouseleave', () => { if(sendKeyBtn.classList.contains('down')){ sendKeyBtn.classList.remove('down'); sendKey.keyUp(); keySidetone.off(); } });
+  sendKeyBtn.addEventListener('touchstart', e => { e.preventDefault(); sendKeyBtn.classList.add('down'); sendKey.keyDown(); keySidetone.on(); });
+  sendKeyBtn.addEventListener('touchend', e => { e.preventDefault(); sendKeyBtn.classList.remove('down'); sendKey.keyUp(); keySidetone.off(); });
+
+  document.getElementById('sendRestart').addEventListener('click', () => {
+    sendKeyBtn.classList.remove('down');
+    keySidetone.off();
+    sendKey.clearText(); // keep the calibrated speed window, just clear the message
+    updateSendDisplay();
+    sendStartTime = performance.now();
+    document.getElementById('sendResult').textContent = '';
+  });
+
+  document.getElementById('sendFinish').addEventListener('click', () => {
+    sendKey.finalizeNow();
+    sendKey.stopPolling();
+    keySidetone.stop();
+    updateSendDisplay();
+    const elapsedMin = (performance.now() - sendStartTime) / 60000;
+    const sentWords = sendKey.state.text.trim().split(/\s+/).filter(Boolean);
+    const truthWords = SENDING_PASSAGE.toUpperCase().split(/\s+/);
+    let correct = 0;
+    for(let i=0;i<truthWords.length;i++){ if(sentWords[i] === truthWords[i]) correct++; }
+    const accuracy = Math.round((correct/truthWords.length)*100);
+    const effectiveWpm = elapsedMin > 0 ? (25/elapsedMin) : 0;
+    const pass = accuracy >= 80 && effectiveWpm >= 4.5; // small tolerance around 5 wpm
+    appState = saveState({ sendResult: { pass, accuracy, wpm: Math.round(effectiveWpm*10)/10, date: new Date().toISOString() } });
+    setBadge('sendBadge', pass ? 'pass' : 'fail', pass ? 'Passed' : 'Try again');
+    document.getElementById('sendResult').innerHTML =
+      'Decoded: <em>'+ (sendKey.state.text || '(nothing decoded)') +'</em><br>'+
+      'Raw pattern: <code>'+ (sendKey.rawString() || '(none)') +'</code><br>'+
+      'Accuracy vs. passage: '+accuracy+'%<br>'+
+      'Effective speed: '+ (Math.round(effectiveWpm*10)/10) +' wpm (need 5+, some tolerance given)';
+    sendKeyArea.style.display = 'none';
+    document.getElementById('sendStart').disabled = false;
+    updateCertificate();
+  });
+
+  // ----- Stop whatever's running in a test when the Scout navigates away -----
+  // Without this, e.g. a conversation line (or the copy-test message) kept
+  // playing in the background after switching tabs, and the live-decode
+  // polling loop for the sending test kept ticking too.
+  function stopActiveTabProcesses(name){
+    stopCurrentPlayback();
+    keySidetone.off();
+    if(name === 'conversation' && convActive){
+      finishConversation(); // same cleanup + grading as pressing "Stop Conversation"
+    }
+    if(name === 'copy' && copyInterval){
+      clearInterval(copyInterval);
+      copyInterval = null;
+      copyPauseBtn.style.display = 'none';
+      document.getElementById('copyStart').disabled = false;
+    }
+    if(name === 'sending' && sendKeyArea.style.display === 'block'){
+      sendKeyBtn.classList.remove('down');
+      sendKey.stopPolling();
+    }
+  }
+
+  // ----- Spacebar as an alternate key, for whichever test is active -----
+  // Only hijack the spacebar when the user isn't typing into a text field —
+  // otherwise it's impossible to type a space into Notes, "Type what you
+  // copied", or the name/troop/council fields.
+  function isTypingTarget(el){
+    return !!el && (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT' || el.isContentEditable);
+  }
+  document.addEventListener('keydown', e => {
+    if(e.code !== 'Space' || e.repeat) return;
+    if(isTypingTarget(document.activeElement)) return;
+    if(convKeyArea.style.display === 'block'){
+      e.preventDefault();
+      convKeyBtn.classList.add('down'); convKey.keyDown(); keySidetone.on();
+    } else if(sendKeyArea.style.display === 'block'){
+      e.preventDefault();
+      sendKeyBtn.classList.add('down'); sendKey.keyDown(); keySidetone.on();
+    }
+  });
+  document.addEventListener('keyup', e => {
+    if(e.code !== 'Space') return;
+    if(isTypingTarget(document.activeElement)) return;
+    if(convKeyArea.style.display === 'block'){
+      e.preventDefault();
+      convKeyBtn.classList.remove('down'); convKey.keyUp(); keySidetone.off();
+    } else if(sendKeyArea.style.display === 'block'){
+      e.preventDefault();
+      sendKeyBtn.classList.remove('down'); sendKey.keyUp(); keySidetone.off();
+    }
+  });
+
+  // =========================================================
+  // CERTIFICATE
+  // =========================================================
+  function updateCertificate(){
+    const s = loadState();
+    const allDone = s.convResult && s.convResult.pass && s.copyResult && s.copyResult.pass && s.sendResult && s.sendResult.pass;
+    document.getElementById('certLocked').style.display = allDone ? 'none' : 'block';
+    document.getElementById('certUnlocked').style.display = allDone ? 'block' : 'none';
+    if(allDone){
+      document.getElementById('certName').textContent = s.name || '—';
+      document.getElementById('certTroop').textContent = s.troop || '—';
+      document.getElementById('certCouncil').textContent = s.council || '—';
+      document.getElementById('certConv').textContent = 'Completed — ' + s.convResult.exchanges + ' exchanges over 5 minutes';
+      document.getElementById('certCopy').textContent = 'Passed — ' + s.copyResult.accuracy + '% accuracy';
+      document.getElementById('certSend').textContent = 'Passed — ' + s.sendResult.wpm + ' wpm, ' + s.sendResult.accuracy + '% accuracy';
+      const latest = [s.convResult.date, s.copyResult.date, s.sendResult.date].sort().pop();
+      document.getElementById('certDate').textContent = new Date(latest).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+    }
+  }
+  document.getElementById('printCert').addEventListener('click', () => window.print());
+
+  updateCertificate();
+});
+</script>
+</body>
+</html>
