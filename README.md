@@ -20,28 +20,6 @@ Along the way it also includes:
 - A **Certificate** tab that unlocks once all three requirements pass, pre-filled with the Scout's name, troop, and council, ready to print or save as a PDF.
 - All progress is saved locally in the browser (`localStorage`) — nothing is sent to a server.
 
-## Try it locally
-
-1. Download `index.html` from this repository.
-2. Double-click it (or drag it into a browser tab). It opens and runs fully offline.
-3. Work through Setup → Settings → the three requirement tabs → Certificate.
-
-## Hosting it on GitHub Pages
-
-This repository is set up to be published with **GitHub Pages**, so you can share one link with your whole troop instead of emailing a file around.
-
-1. Make sure `index.html` sits at the root of this repository (GitHub Pages looks for that file name by default).
-2. Go to the repository's **Settings → Pages**.
-3. Under **Build and deployment**, set the source to **Deploy from a branch**.
-4. Choose the `main` branch and the `/ (root)` folder, then save.
-5. GitHub will publish the site within a couple of minutes at:
-
-   ```
-   https://<your-github-username>.github.io/<this-repository-name>/
-   ```
-
-6. Share that link with your Scouts. To update the app later, just commit a new version of `index.html` to `main` — GitHub Pages redeploys automatically, no separate build or release step needed.
-
 ## What's graded automatically vs. not
 
 - The **copy** and **sending** tests are auto-graded: the app measures typing/keying accuracy and effective words-per-minute and marks pass/fail.
