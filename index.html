@@ -208,6 +208,14 @@
       <button class="primary" id="convStart">Start Conversation</button>
       <button class="secondary" id="convStop" style="display:none;">⏹ Stop Conversation</button>
 
+      <div id="convCalibrateArea" style="display:none;">
+        <p class="note">First, calibrate: key the letter <strong>A</strong> (dot-dash, &bull;&ndash;), then pause briefly like you naturally would <strong>between two words</strong>, then key <strong>A</strong> again. Repeat once or twice, then press "Begin Conversation" when ready. (This doesn't count against your 5 minutes.)</p>
+        <div class="keybtn" id="convCalibKeyBtn">HOLD (click/tap) or press-and-hold the SPACEBAR to key a dot/dash — release to end it</div>
+        <div class="decoded" id="convCalibDecoded"></div>
+        <div class="raw" id="convCalibRaw" style="font-size:0.85em; opacity:0.75; letter-spacing:1px;"></div>
+        <button class="primary" id="convCalibrateDone">Begin Conversation ▶</button>
+      </div>
+
       <div id="convBody" style="display:none;">
         <p class="note" id="convIncomingNote">🔊 BASE CAMP is sending a line in Morse code. Listen closely — the text won't be shown here.</p>
         <button class="secondary" id="convReplay">🔁 Replay this line</button>
@@ -885,10 +893,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const convKeyArea = document.getElementById('convKeyArea');
   const convKeyBtn = document.getElementById('convKeyBtn');
   const convDecoded = document.getElementById('convDecoded');
-  let convInterval = null, convSecondsLeft = 300, convScriptIndex = 0, convExchanges = 0, currentAiLine = '', convPlaying = false, convActive = false;
+  let convInterval = null, convSecondsLeft = 300, convScriptIndex = 0, convExchanges = 0, currentAiLine = '', convPlaying = false, convActive = false, convCalibrating = false;
   const convKey = makeKeyInput(currentWpm);
   const convStartBtn = document.getElementById('convStart');
   const convStopBtn = document.getElementById('convStop');
+  const convCalibrateArea = document.getElementById('convCalibrateArea');
+  const convCalibKeyBtn = document.getElementById('convCalibKeyBtn');
+  const convCalibDecoded = document.getElementById('convCalibDecoded');
+  const convCalibRaw = document.getElementById('convCalibRaw');
+  const convCalibrateDoneBtn = document.getElementById('convCalibrateDone');
+
+  function updateConvCalibDisplay(){
+    convCalibDecoded.textContent = convKey.displayString();
+    convCalibRaw.textContent = convKey.rawString();
+  }
 
   function logLine(cls, text){
     const p = document.createElement('div');
@@ -898,10 +916,42 @@ document.addEventListener('DOMContentLoaded', () => {
     convTranscript.scrollTop = convTranscript.scrollHeight;
   }
 
-  convStartBtn.addEventListener('click', async () => {
-    convActive = true;
+  // Same calibration this Scout does before the Sending test (requirement
+  // 3): key "A" with a natural word-like pause in the middle. It seeds real
+  // dot/dash contrast AND a demonstrated word-gap length before the timed
+  // conversation begins, instead of every reply starting from a cold,
+  // uncalibrated guess (see makeKeyInput for why that matters).
+  convStartBtn.addEventListener('click', () => {
     convStartBtn.style.display = 'none';
     convStopBtn.style.display = 'inline-block';
+    convCalibrating = true;
+    convKey.reset();
+    convKey.startCalibrating();
+    updateConvCalibDisplay();
+    convCalibrateArea.style.display = 'block';
+    convKey.startPolling(updateConvCalibDisplay);
+  });
+
+  function cancelConvCalibration(){
+    convCalibrating = false;
+    convKey.stopPolling();
+    convKeyBtn.classList.remove('down');
+    convCalibKeyBtn.classList.remove('down');
+    keySidetone.stop();
+    convCalibrateArea.style.display = 'none';
+    convStartBtn.style.display = '';
+    convStopBtn.style.display = 'none';
+  }
+
+  convCalibrateDoneBtn.addEventListener('click', async () => {
+    convKey.finalizeNow();
+    convKey.endCalibrating();
+    convKey.clearText();
+    convKey.stopPolling();
+    convCalibrating = false;
+    convCalibrateArea.style.display = 'none';
+
+    convActive = true;
     convTranscript.innerHTML = '';
     convNotes.value = '';
     convBody.style.display = 'block';
@@ -911,7 +961,16 @@ document.addEventListener('DOMContentLoaded', () => {
     await playNextAiLine();
   });
 
-  convStopBtn.addEventListener('click', () => finishConversation());
+  convCalibKeyBtn.addEventListener('mousedown', () => { convCalibKeyBtn.classList.add('down'); convKey.keyDown(); keySidetone.on(); });
+  convCalibKeyBtn.addEventListener('mouseup', () => { convCalibKeyBtn.classList.remove('down'); convKey.keyUp(); keySidetone.off(); });
+  convCalibKeyBtn.addEventListener('mouseleave', () => { if(convCalibKeyBtn.classList.contains('down')){ convCalibKeyBtn.classList.remove('down'); convKey.keyUp(); keySidetone.off(); } });
+  convCalibKeyBtn.addEventListener('touchstart', e => { e.preventDefault(); convCalibKeyBtn.classList.add('down'); convKey.keyDown(); keySidetone.on(); });
+  convCalibKeyBtn.addEventListener('touchend', e => { e.preventDefault(); convCalibKeyBtn.classList.remove('down'); convKey.keyUp(); keySidetone.off(); });
+
+  convStopBtn.addEventListener('click', () => {
+    if(convCalibrating) cancelConvCalibration();
+    else finishConversation();
+  });
 
   function tickConvTimer(){
     convSecondsLeft--;
@@ -944,7 +1003,10 @@ document.addEventListener('DOMContentLoaded', () => {
     convIncomingNote.textContent = '✅ Line finished. Replay it if you need to, then key your reply below.';
     if(convSecondsLeft > 0){
       convKeyArea.style.display = 'block';
-      convKey.reset();
+      // clearText (not reset) so the calibrated dot/dash contrast and
+      // demonstrated word-gap length carry through the whole 5-minute
+      // conversation instead of every single reply starting cold again.
+      convKey.clearText();
       convDecoded.textContent = '';
       convKey.startPolling(str => convDecoded.textContent = str);
     }
@@ -975,6 +1037,7 @@ document.addEventListener('DOMContentLoaded', () => {
     convActive = false;
     stopCurrentPlayback();
     clearInterval(convInterval);
+    convCalibrateArea.style.display = 'none';
     convKeyArea.style.display = 'none';
     convBody.style.display = 'none';
     convKey.stopPolling();
@@ -1171,8 +1234,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function stopActiveTabProcesses(name){
     stopCurrentPlayback();
     keySidetone.off();
-    if(name === 'conversation' && convActive){
-      finishConversation(); // same cleanup + grading as pressing "Stop Conversation"
+    if(name === 'conversation'){
+      if(convActive) finishConversation(); // same cleanup + grading as pressing "Stop Conversation"
+      else if(convCalibrating) cancelConvCalibration();
     }
     if(name === 'copy' && copyInterval){
       clearInterval(copyInterval);
@@ -1196,7 +1260,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', e => {
     if(e.code !== 'Space' || e.repeat) return;
     if(isTypingTarget(document.activeElement)) return;
-    if(convKeyArea.style.display === 'block'){
+    if(convCalibrateArea.style.display === 'block'){
+      e.preventDefault();
+      convCalibKeyBtn.classList.add('down'); convKey.keyDown(); keySidetone.on();
+    } else if(convKeyArea.style.display === 'block'){
       e.preventDefault();
       convKeyBtn.classList.add('down'); convKey.keyDown(); keySidetone.on();
     } else if(sendKeyArea.style.display === 'block'){
@@ -1207,7 +1274,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keyup', e => {
     if(e.code !== 'Space') return;
     if(isTypingTarget(document.activeElement)) return;
-    if(convKeyArea.style.display === 'block'){
+    if(convCalibrateArea.style.display === 'block'){
+      e.preventDefault();
+      convCalibKeyBtn.classList.remove('down'); convKey.keyUp(); keySidetone.off();
+    } else if(convKeyArea.style.display === 'block'){
       e.preventDefault();
       convKeyBtn.classList.remove('down'); convKey.keyUp(); keySidetone.off();
     } else if(sendKeyArea.style.display === 'block'){
