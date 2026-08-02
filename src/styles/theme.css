@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap');
+
+:root{
+  /* Official Scouting America brand colors (Scouts BSA program):
+     Source: Scouting America Official Brand Colors and Typefaces */
+  --navy:#003366;   /* Scouting America Dark Blue */
+  --gold:#B39475;   /* Scouting America Tan / Scouts BSA Tan (replaces a generic gold accent) */
+  --tan-dark:#AD9D7B; /* Scouting America Dark Tan */
+  --tan-light:#D6CEBD; /* Scouting America Light Tan */
+  --red:#CE1126;    /* Scouting America Red / Scouts BSA Red */
+  --cream:#E9E9E4;  /* Scouting America Pale Gray */
+  --ink:#232528;    /* Scouting America Neutral Black */
+  --line:#AD9D7B;   /* Scouting America Dark Tan */
+  --good:#006B3F;   /* Scouting America Green (Venturing Green swatch) */
+  --bad:#CE1126;    /* Scouting America Red */
+}

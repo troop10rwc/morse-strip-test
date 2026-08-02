@@ -1,0 +1,43 @@
+button.primary{
+  background:var(--navy); color:#fff; border:none; padding:10px 18px; border-radius:4px; font-size:1rem; cursor:pointer; margin-top:12px;
+}
+button.primary:hover{ background:#123063; }
+button.secondary{
+  background:#fff; color:var(--navy); border:1px solid var(--navy); padding:10px 18px; border-radius:4px; font-size:1rem; cursor:pointer; margin-top:12px;
+}
+button:disabled{ opacity:0.5; cursor:not-allowed; }
+.card{ background:#fff; border:1px solid var(--line); border-radius:8px; padding:16px; margin:14px 0; }
+.card a{ color:var(--navy); }
+.card ul{ margin:8px 0 0; padding-left:20px; }
+.card ul li{ margin-bottom:10px; }
+.morseGrid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(72px,1fr)); gap:8px; margin-top:12px;
+}
+.morseCell{
+  border:1px solid var(--line); border-radius:6px; padding:8px 4px; text-align:center; background:var(--cream);
+  cursor:pointer; transition:background .15s;
+}
+.morseCell:hover{ background:var(--tan-light); }
+.morseCell .letter{ font-size:1.2rem; font-weight:bold; color:var(--navy); }
+.morseCell .pattern{ font-family:monospace; font-size:1rem; letter-spacing:2px; color:var(--red); margin-top:2px; }
+.badge{ display:inline-block; padding:2px 10px; border-radius:12px; font-size:0.8rem; font-weight:bold; }
+.badge.pass{ background:#e3f2e3; color:var(--good); }
+.badge.fail{ background:#fdecea; color:var(--bad); }
+.badge.pending{ background:#eee; color:#666; }
+.timer{ font-size:2rem; font-weight:bold; color:var(--navy); font-family:monospace; }
+.keybtn{
+  width:100%; padding:40px; font-size:1.2rem; text-align:center; background:var(--red); color:#fff;
+  border-radius:10px; user-select:none; cursor:pointer; margin:14px 0; touch-action:none;
+}
+.keybtn.down{ background:#6e0f11; }
+.decoded{
+  font-family:monospace; font-size:1.1rem; background:#fff; border:1px solid var(--line); border-radius:6px;
+  padding:12px; min-height:60px; white-space:pre-wrap; word-break:break-word;
+}
+textarea{ width:100%; min-height:100px; font-family:inherit; font-size:1rem; padding:8px; border:1px solid var(--line); border-radius:4px; }
+.transcript{ max-height:220px; overflow-y:auto; background:#fff; border:1px solid var(--line); border-radius:6px; padding:10px; font-size:0.95rem; }
+.transcript .ai{ color:var(--navy); }
+.transcript .you{ color:var(--red); }
+.note{ font-size:0.85rem; color:#555; }
+.result{ font-weight:bold; margin-top:10px; }
+.locked-msg{ color:#777; font-style:italic; }

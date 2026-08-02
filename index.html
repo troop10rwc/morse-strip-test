@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morse Code Interpreter Strip — Practice &amp; Test</title>
+<link rel="stylesheet" href="src/styles/index.css">
+</head>
+<body>
+
+<header>
+  <h1><img class="stripIcon" src="public/strip-icon.png" alt="Morse Code Interpreter Strip"> Morse Code Interpreter Strip — Practice &amp; Test</h1>
+  <div class="who" id="whoHeader">Not set up yet</div>
+</header>
+
+<nav id="tabs">
+  <button data-tab="setup" class="active">Setup</button>
+  <button data-tab="settings">Settings</button>
+  <button data-tab="resources">Resources</button>
+  <button data-tab="conversation">1. Conversation</button>
+  <button data-tab="copy">2. Copy</button>
+  <button data-tab="sending">3. Sending</button>
+  <button data-tab="certificate" id="certTabBtn">Certificate</button>
+</nav>
+
+<main>
+
+  <!-- SETUP -->
+  <section id="tab-setup" class="active">
+    <h2>Scout Setup</h2>
+    <p>Enter your information once. It's saved on this device so you can come back and finish testing later.</p>
+    <label for="scoutName">Scout Name</label>
+    <input type="text" id="scoutName" placeholder="e.g. Robert Baden-Powell">
+    <div class="row">
+      <div>
+        <label for="scoutTroop">Troop / Unit</label>
+        <input type="text" id="scoutTroop" placeholder="e.g. Troop 1">
+      </div>
+      <div>
+        <label for="scoutCouncil">Council</label>
+        <input type="text" id="scoutCouncil" placeholder="e.g. Gilwell Council">
+      </div>
+    </div>
+    <button class="primary" id="saveSetup">Save &amp; Continue</button>
+    <div class="card">
+      <strong>Requirement overview</strong>
+      <p class="note">You must complete all three of the following at a minimum of 5 words per minute (adjustable up to 25 wpm in Settings):</p>
+      <ol>
+        <li>Carry on a 5-minute conversation in Morse code.</li>
+        <li>Correctly copy a 2-minute message sent in Morse code.</li>
+        <li>Send a 25-word written passage in Morse code.</li>
+      </ol>
+      <p class="note">This app is a self-practice / self-test tool. Requirements #2 and #3 are auto-graded here for practice purposes. Requirement #1 (conversation) is timed and logged, but — like most BSA advancement — a unit leader or merit badge counselor should observe or review the transcript to confirm proficiency before the strip is awarded.</p>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings">
+    <h2>Settings</h2>
+    <label for="wpmRange">Code speed: <span id="wpmVal">5</span> words per minute</label>
+    <input type="range" id="wpmRange" min="5" max="25" step="1" value="5">
+    <label for="volRange">Tone volume</label>
+    <input type="range" id="volRange" min="0" max="100" step="5" value="60">
+    <button class="primary" id="testTone">▶ Play test tone (PARIS)</button>
+    <div class="card">
+      <button class="secondary" id="resetProgress">Reset all progress</button>
+      <p class="note">Clears saved profile, settings, and test results from this browser.</p>
+    </div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section id="tab-resources">
+    <h2>Resources</h2>
+    <div class="card">
+      <strong>Morse Code Alphabet</strong>
+      <label for="resWpmRange">Code speed: <span id="resWpmVal">5</span> words per minute</label>
+      <input type="range" id="resWpmRange" min="5" max="25" step="1" value="5">
+      <p class="note">Tap any letter or number to hear it played at the speed above.</p>
+      <button class="secondary" id="playAlphabet">▶ Play the whole alphabet</button>
+      <div class="morseGrid" id="morseGrid"></div>
+
+      <p class="note" style="margin-top:16px;"><strong>Common punctuation</strong></p>
+      <button class="secondary" id="playPunctuation">▶ Play punctuation</button>
+      <div class="morseGrid" id="morseGridPunct"></div>
+    </div>
+    <div class="card">
+      <strong>Learn more</strong>
+      <ul>
+        <li><a href="https://www.arrl.org/files/file/Scouting/morse-code-interpreter-strip-final.pdf" target="_blank" rel="noopener">Official Interpreter Strip requirements (ARRL / BSA PDF)</a> — the source sheet these three tests are built from. Fun fact from the sheet: the strip's own dot-dash pattern spells out M‑O‑R‑S‑E.</li>
+        <li><a href="https://morse.withgoogle.com/learn/" target="_blank" rel="noopener">Google's free interactive Morse code trainer</a> — a game-like way to build speed and muscle memory outside of practice sessions here. Works best on a phone held in landscape mode.</li>
+        <li><a href="https://morsle.fun/" target="_blank" rel="noopener">Morsle</a> — a free daily Morse code puzzle, Wordle-style. A fun, low-pressure way to keep decoding skills sharp between practice sessions.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CONVERSATION -->
+  <section id="tab-conversation">
+    <h2>1. Five-Minute Conversation</h2>
+    <p class="note">The app will play short lines in Morse code — the text is never shown, so you have to copy it by ear, just like a real contact. Use the Notes box to write down what you copy, then key your own reply using the button below or the spacebar (press and hold for dots/dashes, like a telegraph key — you'll hear a tone while it's held down). The session runs for 5 minutes. Send at whatever speed feels natural; the app figures out your dots and dashes on its own.</p>
+    <div class="card">
+      <span>Status: <span id="convBadge" class="badge pending">Not started</span></span>
+      <div class="timer" id="convTimer">05:00</div>
+      <button class="primary" id="convStart">Start Conversation</button>
+      <button class="secondary" id="convStop" style="display:none;">⏹ Stop Conversation</button>
+
+      <div id="convCalibrateArea" style="display:none;">
+        <p class="note">First, calibrate: key the letter <strong>A</strong> (dot-dash, &bull;&ndash;), then pause briefly like you naturally would <strong>between two words</strong>, then key <strong>A</strong> again. Repeat once or twice, then press "Begin Conversation" when ready. (This doesn't count against your 5 minutes.)</p>
+        <div class="keybtn" id="convCalibKeyBtn">HOLD (click/tap) or press-and-hold the SPACEBAR to key a dot/dash — release to end it</div>
+        <div class="decoded" id="convCalibDecoded"></div>
+        <div class="raw" id="convCalibRaw" style="font-size:0.85em; opacity:0.75; letter-spacing:1px;"></div>
+        <button class="primary" id="convCalibrateDone">Begin Conversation ▶</button>
+      </div>
+
+      <div id="convBody" style="display:none;">
+        <p class="note" id="convIncomingNote">🔊 BASE CAMP is sending a line in Morse code. Listen closely — the text won't be shown here.</p>
+        <button class="secondary" id="convReplay">🔁 Replay this line</button>
+
+        <label for="convNotes">Your notes (write down what you're copying):</label>
+        <textarea id="convNotes" placeholder="Jot down what you think each incoming line says as you copy it..."></textarea>
+
+        <div id="convKeyArea" style="display:none;">
+          <label>Your reply — key it in Morse:</label>
+          <div class="keybtn" id="convKeyBtn">HOLD (click/tap) or press-and-hold the SPACEBAR to key a dot/dash — release to end it</div>
+          <div class="decoded" id="convDecoded"></div>
+          <button class="secondary" id="convSendLine">Send this reply</button>
+        </div>
+      </div>
+
+      <div class="transcript" id="convTranscript"></div>
+    </div>
+  </section>
+
+  <!-- COPY -->
+  <section id="tab-copy">
+    <h2>2. Two-Minute Copy Test</h2>
+    <p class="note">A historical Scouting passage will be sent in Morse code (Robert Baden-Powell's writings / Scouting for Boys). As you hear each letter, translate it in your head and type the plain-English word directly into the box below — that's the actual skill this requirement tests. You can pause if you need a moment, and there's no separate "notes" step: what you type in the box is what gets graded.</p>
+    <div class="card">
+      <span>Status: <span id="copyBadge" class="badge pending">Not started</span></span>
+      <button class="primary" id="copyStart">▶ Play Message</button>
+      <button class="secondary" id="copyPause" style="display:none;">⏸ Pause</button>
+      <div class="timer" id="copyTimer" style="display:none;">00:00</div>
+      <label for="copyInput">Type what you copied (plain English, as you decode it):</label>
+      <textarea id="copyInput" placeholder="Start typing the translated words as soon as you hear the message begin..."></textarea>
+      <button class="primary" id="copySubmit" disabled>Submit Copy</button>
+      <div class="result" id="copyResult"></div>
+    </div>
+  </section>
+
+  <!-- SENDING -->
+  <section id="tab-sending">
+    <h2>3. Send a 25-Word Passage</h2>
+    <p class="note">Send the passage below in Morse code using the key or the spacebar. Press and hold for a dot or dash (you'll hear a tone while it's held down); release when done. Pause briefly between letters, and a bit longer between words. Send at whatever speed feels natural — the app measures your actual speed and checks it against the 5 wpm minimum afterward.</p>
+    <div class="card">
+      <strong>Passage to send:</strong>
+      <p id="sendPassage" style="font-style:italic;"></p>
+      <span>Status: <span id="sendBadge" class="badge pending">Not started</span></span>
+      <button class="primary" id="sendStart">Start Sending Test</button>
+      <div id="sendKeyArea" style="display:none;">
+        <p class="note" id="sendPhaseNote">First, calibrate: key the letter <strong>A</strong> (dot-dash, &bull;&ndash;), then pause briefly like you naturally would <strong>between two words</strong>, then key <strong>A</strong> again. Repeat once or twice, then press "Start Message" when ready.</p>
+        <div class="keybtn" id="sendKeyBtn">HOLD (click/tap) or press-and-hold the SPACEBAR to key — release to end the dot/dash</div>
+        <button class="primary" id="sendCalibrateDone">Start Message ▶</button>
+        <div class="decoded" id="sendDecoded"></div>
+        <div class="raw" id="sendRaw" style="font-size:0.85em; opacity:0.75; letter-spacing:1px;"></div>
+        <div class="row" id="sendMessageControls" style="margin-top:8px; display:none;">
+          <button class="secondary" id="sendRestart">↺ Start Over</button>
+          <button class="primary" id="sendFinish">I'm Finished Sending</button>
+        </div>
+        <p class="note" id="sendMistakeNote" style="display:none;">Made a mistake? Click <strong>Start Over</strong> to clear what you've keyed and restart the timing — no need to submit first.</p>
+      </div>
+      <div class="result" id="sendResult"></div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATE -->
+  <section id="tab-certificate">
+    <h2>Certificate</h2>
+    <div id="certLocked" class="locked-msg">Complete all three requirements to unlock your certificate.</div>
+    <div id="certUnlocked" style="display:none;">
+      <div id="certificate">
+        <div class="sub">SCOUTING AMERICA</div>
+        <h2>Morse Code Interpreter Strip</h2>
+        <img class="stripImg" src="public/strip-icon.png" alt="Morse Code Interpreter Strip insignia">
+        <p>This certifies that</p>
+        <div class="name" id="certName">—</div>
+        <p>of <span id="certTroop">—</span>, <span id="certCouncil">—</span> council,</p>
+        <p>has demonstrated proficiency in Morse Code by completing all requirements below.</p>
+        <table>
+          <tr><td>1. Five-minute conversation</td><td id="certConv">—</td></tr>
+          <tr><td>2. Two-minute copy (accuracy)</td><td id="certCopy">—</td></tr>
+          <tr><td>3. Twenty-five word sending</td><td id="certSend">—</td></tr>
+        </table>
+        <p>Date completed: <span class="line" id="certDate">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+        <p style="margin-top:30px;">Verified by (unit leader / counselor signature): <span class="line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+      </div>
+      <button class="primary no-print" id="printCert">🖨 Print / Save as PDF</button>
+    </div>
+  </section>
+
+</main>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>

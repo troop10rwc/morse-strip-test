@@ -1,0 +1,17 @@
+#certificate{
+  border:10px double var(--tan-dark); background:#fffdf7; padding:40px; text-align:center; margin-top:16px;
+  font-family:'Times New Roman', Georgia, serif;
+}
+#certificate h2{ border:none; font-size:1.8rem; color:var(--navy); margin-bottom:0; font-family:'Montserrat', Arial, sans-serif; }
+#certificate .sub{ letter-spacing:2px; color:var(--red); font-weight:bold; font-family:'Montserrat', Arial, sans-serif; }
+#certificate .stripImg{ height:38px; width:auto; margin:14px 0; }
+#certificate .name{ font-size:1.6rem; margin:18px 0 4px; color:var(--red); font-family:'Brush Script MT', cursive, Georgia, serif; }
+#certificate .line{ border-bottom:1px solid #999; display:inline-block; min-width:220px; }
+#certificate table{ margin:20px auto; text-align:left; font-family:'Times New Roman', Georgia, serif; }
+#certificate table td{ padding:3px 10px; }
+@media print{
+  header, nav, .no-print{ display:none !important; }
+  section{ display:none !important; }
+  section#tab-certificate{ display:block !important; }
+  body{ background:#fff; }
+}
