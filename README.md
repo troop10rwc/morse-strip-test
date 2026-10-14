@@ -81,7 +81,7 @@ The 2-minute copy passages are written in the spirit of Robert Baden-Powell's Sc
 
 ## License
 
-The app's own code is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE) — free to use, modify, and share for any noncommercial purpose (which covers all Scouting, educational, and personal use); commercial use requires permission from the copyright holder. No warranty — this is a self-practice tool, not an official BSA/Scouting America product.
+The app's own code is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE.md) — free to use, modify, and share for any noncommercial purpose (which covers all Scouting, educational, and personal use); commercial use requires permission from the copyright holder. No warranty — this is a self-practice tool, not an official BSA/Scouting America product.
 
 **Third-party components are not bundled and are not covered by that license.** They are fetched at runtime under their own terms:
 
