@@ -66,7 +66,9 @@ Anything you'd like to customize lives in plain text near the top of the script 
 ## What's graded automatically vs. not
 
 - The **copy** and **sending** tests are auto-graded: the app measures typing/keying accuracy and effective words-per-minute and marks pass/fail.
+  - Accuracy uses word-level edit distance (word error rate), so one merged or extra word costs 1–2 errors rather than misaligning the rest of the passage. A letter-level match is shown for context; pass/fail uses the word-level score (80% required).
 - The **conversation** test is timed and logged. It counts completed exchanges (4 needed to mark "Completed"); it does not judge the quality of the Scout's replies. At slow speeds (around 5 wpm) four exchanges can be tight inside 5 minutes — lower the threshold if your Scouts hit it too often. A unit leader or counselor should review the transcript and notes (or observe live) before signing off.
+- **Retrying:** each requirement is saved separately. A Scout who fails one can retry it (the start button becomes "Try … Again") without losing the others, and an already-passed requirement is never downgraded by a later failed attempt. Progress is stored in the browser, so it also survives closing the page; **Settings → Reset all progress** clears it.
 - The certificate includes a blank signature line for that reason. This app is a self-practice and record-keeping tool, not a substitute for your council's official advancement process.
 
 ## Known limitations
@@ -89,8 +91,3 @@ The app's own code is licensed under the [PolyForm Noncommercial License 1.0.0](
 | Transformers.js 3.8.1 | jsDelivr CDN | Apache-2.0 |
 | Qwen2.5-0.5B-Instruct (ONNX build by onnx-community) | Hugging Face | Apache-2.0 |
 | Qwen1.5-0.5B-Chat (ONNX build by Xenova), fallback only | Hugging Face | Tongyi Qianwen Research License |
-
-The fallback model's license is more restrictive than Apache-2.0 and is aimed at research use. If you want to avoid it entirely, remove the `Xenova/Qwen1.5-0.5B-Chat` line from `chooseAiAttempts()`; the app will use the built-in script if the primary model can't load. See the [LICENSE](LICENSE) file for full details and the trademark notice.
-| Qwen1.5-0.5B-Chat (ONNX build by Xenova), fallback only | Hugging Face | Tongyi Qianwen Research License |
-
-The fallback model's license is more restrictive than Apache-2.0 and is aimed at research use. If you want to avoid it entirely, remove the `Xenova/Qwen1.5-0.5B-Chat` line from `chooseAiAttempts()`; the app will use the built-in script if the primary model can't load. See the [LICENSE](LICENSE) file for full details and the trademark notice.
