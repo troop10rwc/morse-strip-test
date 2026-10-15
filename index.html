@@ -24,6 +24,7 @@
   *{box-sizing:border-box;}
   body{
     margin:0; font-family:Verdana, Arial, sans-serif; background:var(--cream); color:var(--ink);
+    min-height:100vh; display:flex; flex-direction:column; /* keeps the footer at the bottom on short pages */
   }
   header{
     background:var(--navy); color:#fff; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;
@@ -40,7 +41,7 @@
   }
   nav button.active{ border-bottom-color:var(--gold); font-weight:bold; }
   nav button:disabled{ color:#aaa; cursor:not-allowed; }
-  main{ max-width:760px; margin:0 auto; padding:20px 16px 60px; }
+  main{ max-width:760px; width:100%; margin:0 auto; padding:20px 16px 60px; flex:1 0 auto; }
   section{ display:none; }
   section.active{ display:block; }
   h2{ color:var(--navy); border-bottom:2px solid var(--gold); padding-bottom:6px; font-family:'Montserrat', Arial, sans-serif; font-weight:700; }
@@ -107,8 +108,16 @@
   #certificate .line{ border-bottom:1px solid #999; display:inline-block; min-width:220px; }
   #certificate table{ margin:20px auto; text-align:left; font-family:'Times New Roman', Georgia, serif; }
   #certificate table td{ padding:3px 10px; }
+  footer#appFooter{
+    background:var(--navy); color:#fff; text-align:center; font-size:0.8rem; line-height:1.6;
+    padding:16px 16px 20px; border-top:3px solid var(--gold);
+  }
+  footer#appFooter p{ margin:2px 0; }
+  footer#appFooter a{ color:var(--tan-light); text-decoration:underline; }
+  footer#appFooter a:hover, footer#appFooter a:focus{ color:#fff; }
+  footer#appFooter .disclaimer{ opacity:0.8; font-size:0.72rem; max-width:640px; margin:6px auto 0; }
   @media print{
-    header, nav, .no-print{ display:none !important; }
+    header, nav, footer#appFooter, .no-print{ display:none !important; }
     section{ display:none !important; }
     section#tab-certificate{ display:block !important; }
     body{ background:#fff; }
@@ -309,6 +318,13 @@
 
 </main>
 
+<footer id="appFooter">
+  <p>Morse Code Interpreter Strip Trainer &middot; Version <span id="appVersion">2.1</span></p>
+  <p>&copy; <span id="copyYear">2026</span> Troop 10, Redwood City, CA</p>
+  <p>Licensed under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0" target="_blank" rel="noopener noreferrer">PolyForm Noncommercial License 1.0.0</a> &middot; <a href="https://github.com/troop10rwc/morse-strip-test-v2" target="_blank" rel="noopener noreferrer">Source code</a></p>
+  <p class="disclaimer">Independent, unofficial practice tool. Not affiliated with, endorsed by, or sponsored by Scouting America. &ldquo;Scouting America&rdquo; and &ldquo;Scouts BSA&rdquo; are trademarks of their respective owner.</p>
+</footer>
+
 <script>
 /* ============================================================
    MORSE CODE PRACTICE APP
@@ -316,6 +332,21 @@
    Uses localStorage to remember profile/settings/progress on
    this device/browser only.
    ============================================================ */
+
+// ---------- App version & footer ----------
+// Single source of truth for the version shown in the footer. Follow
+// semantic versioning (MAJOR.MINOR[.PATCH]) and bump it with each release.
+const APP_VERSION = '2.1';
+const COPYRIGHT_START_YEAR = 2026; // first year of publication
+(function renderFooter(){
+  const y = new Date().getFullYear();
+  // "2026" in the first year, "2026–2027" (first year – current year) afterwards.
+  const yearText = y > COPYRIGHT_START_YEAR ? COPYRIGHT_START_YEAR + '\u2013' + y : String(COPYRIGHT_START_YEAR);
+  const v = document.getElementById('appVersion');
+  const c = document.getElementById('copyYear');
+  if(v) v.textContent = APP_VERSION;
+  if(c) c.textContent = yearText;
+})();
 
 // ---------- Morse alphabet ----------
 const MORSE = {
@@ -515,7 +546,7 @@ function makeSidetone(getVolume){
 // of the message comes in.
 function makeKeyInput(getWpm){
   const WINDOW_SIZE = 12; // recent presses used for calibration
-  const state = { down:false, downAt:0, upAt:0, durationWindow:[], pendingDurations:[], text:'', rawText:'', pollTimer:null, calibrating:false, maxCalGap:0 };
+  const state = { down:false, downAt:0, upAt:0, durationWindow:[], pendingDurations:[], text:'', rawText:'', pollTimer:null, calibrating:false, maxCalGap:0, calGaps:[] };
 
   // A Scout's real "let me think of the next letter" pause between letters
   // doesn't shrink just because the Settings speed is set higher — it's
@@ -536,10 +567,58 @@ function makeKeyInput(getWpm){
   // (or skipped calibration) still gets the proven-reliable default rather
   // than a threshold weakened by one noisy sample.
   let calibratedWordGap = null;
-  function startCalibrating(){ state.calibrating = true; state.maxCalGap = 0; }
+  // The same calibration tap also demonstrates the Scout's own longest
+  // pause INSIDE a letter (the gap between the dot and the dash of "A").
+  // A beginner at 5 wpm often presses dots briefly but then hesitates a lot
+  // longer than "2 dot-lengths" before the next element; with a threshold
+  // based only on press length, that hesitation was read as the end of the
+  // letter and one letter split into several (A became E T). We cluster the
+  // calibration gaps into "inside a letter" vs "between words" and use the
+  // inside-a-letter ceiling to set the letter-break threshold.
+  let calibratedIntraGap = null;
+  // Fraction of the Scout's demonstrated between-words pause that counts as a word break.
+  const WORD_GAP_FACTOR = 0.6;
+  function startCalibrating(){ state.calibrating = true; state.maxCalGap = 0; state.calGaps = []; }
   function endCalibrating(){
     state.calibrating = false;
     if(state.maxCalGap > 0) calibratedWordGap = state.maxCalGap;
+    const g = state.calGaps.slice();
+    if(g.length >= 2){
+      let lo = Math.min(...g), hi = Math.max(...g);
+      for(let i=0;i<8;i++){
+        const a=[], b=[];
+        g.forEach(x => (Math.abs(x-lo) <= Math.abs(x-hi) ? a : b).push(x));
+        if(a.length) lo = a.reduce((x,y)=>x+y,0)/a.length;
+        if(b.length) hi = b.reduce((x,y)=>x+y,0)/b.length;
+      }
+      if(hi >= lo*1.8){
+        const low = g.filter(x => Math.abs(x-lo) <= Math.abs(x-hi));
+        const high = g.filter(x => Math.abs(x-lo) > Math.abs(x-hi));
+        if(low.length) calibratedIntraGap = Math.max(...low);
+        // Use the AVERAGE between-words pause, not the single longest one:
+        // the longest calibration gap is often the extra-long rest between
+        // repeats of "A _ A", which would push the word-break threshold
+        // above the Scout's real word gaps and merge words together.
+        if(high.length) calibratedWordGap = high.reduce((x,y)=>x+y,0)/high.length;
+      }
+    }
+  }
+  // Gap (ms) at/above which the current letter is considered finished.
+  // Used both when the next press arrives and by the idle auto-finalize
+  // poll, so a mid-letter hesitation is handled the same way in both.
+  function letterThresh(unit){
+    let t = unit*2.2;
+    if(calibratedIntraGap !== null){
+      t = Math.max(t, calibratedIntraGap*1.3);
+      // keep it comfortably below the word-break threshold
+      if(calibratedWordGap !== null) t = Math.min(t, Math.max(unit*2.2, calibratedWordGap*WORD_GAP_FACTOR*0.6));
+    }
+    return t;
+  }
+  function wordThreshFor(unit){
+    const lt = letterThresh(unit);
+    const d = Math.max(unit*4.2, lt*1.8);
+    return calibratedWordGap !== null ? Math.max(d, calibratedWordGap*WORD_GAP_FACTOR) : d;
   }
 
   // Deliberately NOT pre-seeded with a placeholder duration: if the Settings
@@ -628,14 +707,13 @@ function makeKeyInput(getWpm){
     if(state.upAt){
       const gap = now - state.upAt;
       const unit = currentUnit();
-      if(state.calibrating) state.maxCalGap = Math.max(state.maxCalGap, gap);
-      const defaultWordThresh = unit*4.2;
-      const wordThresh = calibratedWordGap !== null ? Math.max(defaultWordThresh, calibratedWordGap*0.75) : defaultWordThresh;
+      if(state.calibrating){ state.maxCalGap = Math.max(state.maxCalGap, gap); state.calGaps.push(gap); }
+      const wordThresh = wordThreshFor(unit);
       if(gap >= wordThresh){
         finalizePending();
         state.text += ' ';
         state.rawText += ' / ';
-      } else if(gap >= unit*2){
+      } else if(gap >= letterThresh(unit)){
         finalizePending();
       }
       // else: intra-character gap — keep accumulating the same letter
@@ -682,14 +760,14 @@ function makeKeyInput(getWpm){
       // auto-finalize a trailing letter if the key has been idle long enough
       if(!state.down && state.upAt && state.pendingDurations.length){
         const gap = performance.now() - state.upAt;
-        if(gap >= currentUnit()*2) finalizePending();
+        if(gap >= letterThresh(currentUnit())) finalizePending();
       }
       onUpdate(displayString());
     }, 150);
   }
   function stopPolling(){ if(state.pollTimer) clearInterval(state.pollTimer); state.pollTimer = null; }
 
-  function reset(){ state.down=false; state.downAt=0; state.upAt=0; seedWindow(); smoothedUnit=null; calibratedWordGap=null; state.calibrating=false; state.maxCalGap=0; state.pendingDurations=[]; state.text=''; state.rawText=''; }
+  function reset(){ state.down=false; state.downAt=0; state.upAt=0; seedWindow(); smoothedUnit=null; calibratedWordGap=null; calibratedIntraGap=null; state.calibrating=false; state.maxCalGap=0; state.calGaps=[]; state.pendingDurations=[]; state.text=''; state.rawText=''; }
   function finalizeNow(){ finalizePending(); }
   // Clears decoded text/pending strokes WITHOUT wiping the calibrated
   // durationWindow — used when moving from a practice/calibration tap into
