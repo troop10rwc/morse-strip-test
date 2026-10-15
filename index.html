@@ -319,7 +319,7 @@
 </main>
 
 <footer id="appFooter">
-  <p>Morse Code Interpreter Strip Trainer &middot; Version <span id="appVersion">2.1</span></p>
+  <p>Morse Code Interpreter Strip Trainer &middot; Version <span id="appVersion">2.3</span></p>
   <p>&copy; <span id="copyYear">2026</span> Troop 10, Redwood City, CA</p>
   <p>Licensed under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0" target="_blank" rel="noopener noreferrer">PolyForm Noncommercial License 1.0.0</a> &middot; <a href="https://github.com/troop10rwc/morse-strip-test-v2" target="_blank" rel="noopener noreferrer">Source code</a></p>
   <p class="disclaimer">Independent, unofficial practice tool. Not affiliated with, endorsed by, or sponsored by Scouting America. &ldquo;Scouting America&rdquo; and &ldquo;Scouts BSA&rdquo; are trademarks of their respective owner.</p>
@@ -336,7 +336,7 @@
 // ---------- App version & footer ----------
 // Single source of truth for the version shown in the footer. Follow
 // semantic versioning (MAJOR.MINOR[.PATCH]) and bump it with each release.
-const APP_VERSION = '2.1';
+const APP_VERSION = '2.3';
 const COPYRIGHT_START_YEAR = 2026; // first year of publication
 (function renderFooter(){
   const y = new Date().getFullYear();
@@ -778,6 +778,35 @@ function makeKeyInput(getWpm){
   return { keyDown, keyUp, startPolling, stopPolling, reset, finalizeNow, clearText, state, displayString, rawString, startCalibrating, endCalibrating };
 }
 
+// ---------- Scoring (used by the Copy and Sending tests) ----------
+// Levenshtein edit distance over any two arrays/strings: the minimum number
+// of substitutions, insertions, and deletions to turn `a` into `b`.
+function editDistance(a, b){
+  let prev = Array.from({length: b.length + 1}, (_, j) => j);
+  for(let i = 1; i <= a.length; i++){
+    const cur = [i];
+    for(let j = 1; j <= b.length; j++){
+      cur[j] = Math.min(prev[j] + 1, cur[j-1] + 1, prev[j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+    }
+    prev = cur;
+  }
+  return prev[b.length];
+}
+// Word-level accuracy = 1 - (word edit distance / words in the passage),
+// the standard "word error rate" approach. Unlike comparing word #1 to word
+// #1, word #2 to word #2, etc., it ALIGNS the two texts first, so one merged
+// or extra word costs 1-2 errors instead of knocking every later word out of
+// position. charAccuracy is the same idea on characters (shown for context
+// only; the pass/fail decision uses the word-level score).
+function scoreWords(truthWords, typedWords){
+  const n = truthWords.length;
+  const wordErrors = editDistance(truthWords, typedWords);
+  const accuracy = n ? Math.max(0, Math.round((1 - wordErrors / n) * 100)) : 0;
+  const t = truthWords.join(' '), u = typedWords.join(' ');
+  const charAccuracy = t.length ? Math.max(0, Math.round((1 - editDistance(t, u) / t.length) * 100)) : 0;
+  return { accuracy, charAccuracy, wordErrors };
+}
+
 // ---------- Persistence ----------
 const STORAGE_KEY = 'morseAppState_v1';
 function loadState(){
@@ -965,6 +994,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = document.getElementById(id);
     el.className = 'badge ' + state;
     el.textContent = text;
+  }
+  // Records one attempt at a requirement. Each requirement is saved under its
+  // own key, so failing one never touches the others. A requirement the Scout
+  // has already PASSED is never downgraded by a later failed attempt (e.g. a
+  // retake, an early Stop, or switching tabs mid-session); a new passing
+  // attempt replaces the old record. Returns the record that is now stored.
+  function recordResult(key, result){
+    const prev = loadState()[key];
+    result.attempts = ((prev && prev.attempts) || 0) + 1;
+    if(prev && prev.pass && !result.pass){
+      appState = saveState({ [key]: Object.assign({}, prev, { attempts: result.attempts }) });
+      return { stored: prev, keptPrevious: true };
+    }
+    appState = saveState({ [key]: result });
+    return { stored: result, keptPrevious: false };
+  }
+  // After a failed attempt, relabel the start button so it is obvious the
+  // Scout can simply run that requirement again.
+  function updateRetryLabels(){
+    const s = loadState();
+    const set = (id, res, retry, normal) => { document.getElementById(id).textContent = (res && !res.pass) ? retry : normal; };
+    set('convStart', s.convResult, '\u21BA Try Conversation Again', 'Start Conversation');
+    set('copyStart', s.copyResult, '\u21BA Try Another Message', '\u25B6 Play Message');
+    set('sendStart', s.sendResult, '\u21BA Try Sending Again', 'Start Sending Test');
   }
   function refreshBadges(){
     const s = loadState();
@@ -1298,8 +1351,8 @@ document.addEventListener('DOMContentLoaded', () => {
     convStopBtn.style.display = 'none';
     const notes = convNotes.value.trim();
     const pass = convExchanges >= 4; // reasonable participation across the 5 minutes
-    appState = saveState({ convResult: { pass, exchanges: convExchanges, notes, date: new Date().toISOString() } });
-    setBadge('convBadge', pass ? 'pass' : 'fail', pass ? 'Completed' : 'Incomplete — practice again');
+    const rec = recordResult('convResult', { pass, exchanges: convExchanges, notes, date: new Date().toISOString() });
+    setBadge('convBadge', rec.stored.pass ? 'pass' : 'fail', rec.stored.pass ? 'Completed' : 'Incomplete — practice again');
     if(notes) logLine('you', '📝 Final notes: ' + notes);
     if(aiSpokenLines.length){
       logLine('ai', '--- Answer key (what BASE CAMP actually sent): ' + aiSpokenLines.join(' | ') + ' ---');
@@ -1307,6 +1360,8 @@ document.addEventListener('DOMContentLoaded', () => {
     logLine('ai', stoppedEarly
       ? '--- Conversation ended early. Review this transcript (and the notes above) with your unit leader or counselor. ---'
       : '--- 5 minutes complete. Review this transcript (and the notes above) with your unit leader or counselor. ---');
+    if(rec.keptPrevious) logLine('ai', '--- This attempt did not pass, but your earlier passing result is kept. ---');
+    else if(!pass) logLine('ai', '--- Not passed yet. Press "Try Conversation Again" to retry; your Copy and Sending results are not affected. ---');
     updateCertificate();
   }
 
@@ -1362,15 +1417,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('copySubmit').addEventListener('click', () => {
     const typed = document.getElementById('copyInput').value.toUpperCase().replace(/[^A-Z0-9\s]/g,'').split(/\s+/).filter(Boolean);
     const truth = copyMessage.toUpperCase().split(/\s+/).filter(Boolean);
-    let correct = 0;
-    const len = Math.max(truth.length, typed.length);
-    for(let i=0;i<truth.length;i++){ if(typed[i] === truth[i]) correct++; }
-    const accuracy = truth.length ? Math.round((correct/truth.length)*100) : 0;
+    const { accuracy, charAccuracy } = scoreWords(truth, typed);
     const pass = accuracy >= 80;
-    appState = saveState({ copyResult: { pass, accuracy, date: new Date().toISOString() } });
-    setBadge('copyBadge', pass ? 'pass' : 'fail', pass ? 'Passed ('+accuracy+'%)' : 'Try again ('+accuracy+'%)');
+    const rec = recordResult('copyResult', { pass, accuracy, date: new Date().toISOString() });
+    setBadge('copyBadge', rec.stored.pass ? 'pass' : 'fail', rec.stored.pass ? 'Passed ('+rec.stored.accuracy+'%)' : 'Try again ('+accuracy+'%)');
     document.getElementById('copyResult').innerHTML =
-      'Accuracy: '+accuracy+'% (need 80%+ to pass)<br>Correct message: <em>'+copyMessage+'</em>';
+      'Accuracy: '+accuracy+'% (need 80%+ to pass) &middot; letter-level match: '+charAccuracy+'%<br>Correct message: <em>'+copyMessage+'</em>' +
+      (rec.keptPrevious ? '<br>This attempt did not pass, but your earlier passing result is kept.'
+        : (!pass ? '<br>Press &ldquo;Try Another Message&rdquo; to retry with a new passage. Your other requirements are not affected.' : ''));
     document.getElementById('copySubmit').disabled = true;
     updateCertificate();
   });
@@ -1464,18 +1518,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const elapsedMin = (performance.now() - sendStartTime) / 60000;
     const sentWords = sendKey.state.text.trim().split(/\s+/).filter(Boolean);
     const truthWords = SENDING_PASSAGE.toUpperCase().split(/\s+/);
-    let correct = 0;
-    for(let i=0;i<truthWords.length;i++){ if(sentWords[i] === truthWords[i]) correct++; }
-    const accuracy = Math.round((correct/truthWords.length)*100);
+    const { accuracy, charAccuracy } = scoreWords(truthWords, sentWords);
     const effectiveWpm = elapsedMin > 0 ? (25/elapsedMin) : 0;
     const pass = accuracy >= 80 && effectiveWpm >= 4.5; // small tolerance around 5 wpm
-    appState = saveState({ sendResult: { pass, accuracy, wpm: Math.round(effectiveWpm*10)/10, date: new Date().toISOString() } });
-    setBadge('sendBadge', pass ? 'pass' : 'fail', pass ? 'Passed' : 'Try again');
+    const rec = recordResult('sendResult', { pass, accuracy, wpm: Math.round(effectiveWpm*10)/10, date: new Date().toISOString() });
+    setBadge('sendBadge', rec.stored.pass ? 'pass' : 'fail', rec.stored.pass ? 'Passed' : 'Try again');
     document.getElementById('sendResult').innerHTML =
       'Decoded: <em>'+ (sendKey.state.text || '(nothing decoded)') +'</em><br>'+
       'Raw pattern: <code>'+ (sendKey.rawString() || '(none)') +'</code><br>'+
-      'Accuracy vs. passage: '+accuracy+'%<br>'+
-      'Effective speed: '+ (Math.round(effectiveWpm*10)/10) +' wpm (need 5+, some tolerance given)';
+      'Accuracy vs. passage: '+accuracy+'% (need 80%+) &middot; letter-level match: '+charAccuracy+'%<br>'+
+      'Effective speed: '+ (Math.round(effectiveWpm*10)/10) +' wpm (need 5+, some tolerance given)' +
+      (rec.keptPrevious ? '<br>This attempt did not pass, but your earlier passing result is kept.'
+        : (!pass ? '<br>Press &ldquo;Try Sending Again&rdquo; to retry. Your other requirements are not affected.' : ''));
     sendKeyArea.style.display = 'none';
     document.getElementById('sendStart').disabled = false;
     updateCertificate();
@@ -1544,6 +1598,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // CERTIFICATE
   // =========================================================
   function updateCertificate(){
+    updateRetryLabels();
     const s = loadState();
     const allDone = s.convResult && s.convResult.pass && s.copyResult && s.copyResult.pass && s.sendResult && s.sendResult.pass;
     document.getElementById('certLocked').style.display = allDone ? 'none' : 'block';
