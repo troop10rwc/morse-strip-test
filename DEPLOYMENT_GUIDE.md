@@ -19,7 +19,7 @@ Anything you want changed lives in plain text inside `index.html` (open it in an
 - The fallback conversation script: `CONV_SCRIPT`
 - AI behavior: `AI_SYSTEM_PROMPT`, `AI_OPENERS`, `AI_MAX_LINE_SECONDS`, `AI_LAZY_LOAD`, and the model list in `chooseAiAttempts()`
 - Colors: the `--navy`, `--red`, and related variables at the top of the `<style>` block
-- Footer version number: `APP_VERSION` near the top of the script (currently 2.1). Bump it with each release; the copyright year updates by itself.
+- Footer version number: `APP_VERSION` near the top of the script (currently 2.3). Bump it with each release; the copyright year updates by itself.
 - Passing scores: search for `pass =`
 
 You can ask an AI assistant like Claude to make edits for you — share `index.html` and describe the change.
@@ -71,7 +71,9 @@ The app uses official Scouting America colors (Scouts BSA Red #CE1126, Scouts BS
 ## 5. What the app does and does not verify
 
 - **Requirement 2 (copy)** and **Requirement 3 (sending)** are auto-graded: the app measures typing/keying accuracy and effective words-per-minute and marks pass/fail.
+  - Accuracy is scored with word-level edit distance (the standard "word error rate"): the Scout's words are aligned to the passage, then substitutions, missing words, and extra words are counted, and accuracy = 1 − errors ÷ words in the passage. A missed word gap or one extra junk word therefore costs 1–2 errors instead of shifting every later word out of position. The result screen also shows a letter-level match for context; pass/fail uses the word-level score (80% required).
 - **Requirement 1 (conversation)** is timed and logged (a transcript is kept). The app counts completed exchanges but does not judge whether the Scout's replies make sense. Treat the in-app session as guided practice, and have a unit leader or merit badge counselor observe the Scout (in person, live, or by reviewing the transcript and answer key) before signing off.
+- **Retrying:** each requirement is saved separately, so a Scout who fails one can run it again without affecting the others. After a failed attempt the start button changes to "Try … Again". A requirement that has already been passed is never downgraded by a later failed attempt, so the certificate stays unlocked. Progress is saved in the browser (`localStorage`), so it also survives closing and reopening the page; "Reset all progress" in Settings clears everything.
 - The certificate screen includes a blank "Verified by (unit leader / counselor signature)" line for this reason. Nothing here replaces your council's official advancement / sign-off process.
 - The 2-minute passage is drawn from lines written in the spirit of Robert Baden-Powell's Scouting writings (public domain: *Scouting for Boys*, 1908, and his 1941 Farewell Message), lightly paraphrased so the app can reliably match exact words. For verbatim historical quotes, swap the `QUOTE_BANK` text for text you've checked against a primary source.
 
@@ -89,6 +91,5 @@ The app uses official Scouting America colors (Scouts BSA Red #CE1126, Scouts BS
 - [ ] Complete all three tests yourself at a few different wpm settings.
 - [ ] Confirm audio plays clearly on a laptop and, if Scouts will use them, a phone or tablet.
 - [ ] Check that your meeting location's network can reach `cdn.jsdelivr.net` and `huggingface.co`, or plan to use the built-in script.
-- [ ] Read through `QUOTE_BANK` and `CONV_SCRIPT` and adjust wording to your troop's taste.
-- [ ] Publish (Section 2) and share the link. Let leaders know the certificate is a self-practice record, not a substitute for their sign-off.
+
 
