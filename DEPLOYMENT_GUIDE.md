@@ -2,8 +2,6 @@
 
 This guide assumes no coding background. The whole app is **one file, `index.html`**. There is nothing to compile, no database, no server, and no API key. The 5-minute conversation is powered by a small AI model that runs **inside each Scout's own web browser**, so it costs nothing to run.
 
-> **Which file?** The AI-enabled build is delivered as `index-ai.html`. Rename it to `index.html` before publishing (hosts look for that name).
-
 ## 1. Try it right now (no hosting needed)
 
 Double-click `index.html` to open it in a recent browser (Chrome or Edge recommended), or use a free test link:
