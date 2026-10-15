@@ -46,6 +46,7 @@ Anything you'd like to customize lives in plain text near the top of the script 
 - The fallback conversation script: `CONV_SCRIPT`
 - AI behavior: `AI_SYSTEM_PROMPT`, `AI_OPENERS`, `AI_MAX_LINE_SECONDS`, `AI_LAZY_LOAD`, and the model list in `chooseAiAttempts()`
 - Colors and fonts: the CSS variables at the top of the `<style>` block
+- Version and copyright year in the footer: `APP_VERSION` and `COPYRIGHT_START_YEAR` near the top of the script (the year updates automatically; bump `APP_VERSION` for each release using semantic versioning)
 - Pass/fail thresholds: search for `pass =` (the conversation requires 4 exchanges — see the note below)
 
 ## Hosting it on GitHub Pages
@@ -79,7 +80,7 @@ The 2-minute copy passages are written in the spirit of Robert Baden-Powell's Sc
 
 ## License
 
-The app's own code is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE.md) — free to use, modify, and share for any noncommercial purpose (which covers all Scouting, educational, and personal use); commercial use requires permission from the copyright holder. No warranty — this is a self-practice tool, not an official BSA/Scouting America product.
+The app's own code is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE) — free to use, modify, and share for any noncommercial purpose (which covers all Scouting, educational, and personal use); commercial use requires permission from the copyright holder. No warranty — this is a self-practice tool, not an official BSA/Scouting America product.
 
 **Third-party components are not bundled and are not covered by that license.** They are fetched at runtime under their own terms:
 
@@ -87,6 +88,9 @@ The app's own code is licensed under the [PolyForm Noncommercial License 1.0.0](
 |---|---|---|
 | Transformers.js 3.8.1 | jsDelivr CDN | Apache-2.0 |
 | Qwen2.5-0.5B-Instruct (ONNX build by onnx-community) | Hugging Face | Apache-2.0 |
+| Qwen1.5-0.5B-Chat (ONNX build by Xenova), fallback only | Hugging Face | Tongyi Qianwen Research License |
+
+The fallback model's license is more restrictive than Apache-2.0 and is aimed at research use. If you want to avoid it entirely, remove the `Xenova/Qwen1.5-0.5B-Chat` line from `chooseAiAttempts()`; the app will use the built-in script if the primary model can't load. See the [LICENSE](LICENSE) file for full details and the trademark notice.
 | Qwen1.5-0.5B-Chat (ONNX build by Xenova), fallback only | Hugging Face | Tongyi Qianwen Research License |
 
 The fallback model's license is more restrictive than Apache-2.0 and is aimed at research use. If you want to avoid it entirely, remove the `Xenova/Qwen1.5-0.5B-Chat` line from `chooseAiAttempts()`; the app will use the built-in script if the primary model can't load. See the [LICENSE](LICENSE) file for full details and the trademark notice.
