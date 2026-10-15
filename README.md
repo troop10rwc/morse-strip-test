@@ -1,10 +1,8 @@
 # Morse Code Interpreter Strip Trainer
 
-A free, self-contained web app for Scouts BSA / Scouting America Scouts practicing and self-testing for the official **Morse Code Interpreter Strip**. It walks a Scout through all three ARRL/BSA requirements, tracks progress on their own device, and generates a printable completion certificate for their unit leader or counselor to sign off on.
+A free, self-contained web app for Scouts BSA / Scouting America Scouts practicing and self-testing for the official **Morse Code Interpreter Strip**. It walks a Scout through all three requirements, tracks progress on their own device, and generates a printable completion certificate for their unit leader or counselor to sign off on.
 
-The whole app is **one file, `index.html`** — no build step, no bundler, no server, no account, no API key. The 5-minute conversation is powered by a small AI language model that runs **inside the Scout's own browser**, so there is nothing to pay for and no backend to maintain.
-
-> **Publishing note:** the AI-enabled build is the single file `index-ai.html`. Save/rename it as `index.html` at the root of your repository (replacing any older version) so GitHub Pages serves it.
+The whole app is **one file, `index.html`** — no build step, no bundler, no server, no account, no API key. The 5-minute conversation is powered by a small AI language model that runs **inside the Scout's own browser**, so there is nothing to pay for and no backend to maintain. It can be accessed at [https://troop10rwc.github.io/morse-strip-test/]
 
 ## What it covers
 
