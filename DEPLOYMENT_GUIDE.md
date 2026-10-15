@@ -19,6 +19,7 @@ Anything you want changed lives in plain text inside `index.html` (open it in an
 - The fallback conversation script: `CONV_SCRIPT`
 - AI behavior: `AI_SYSTEM_PROMPT`, `AI_OPENERS`, `AI_MAX_LINE_SECONDS`, `AI_LAZY_LOAD`, and the model list in `chooseAiAttempts()`
 - Colors: the `--navy`, `--red`, and related variables at the top of the `<style>` block
+- Footer version number: `APP_VERSION` near the top of the script (currently 2.1). Bump it with each release; the copyright year updates by itself.
 - Passing scores: search for `pass =`
 
 You can ask an AI assistant like Claude to make edits for you — share `index.html` and describe the change.
@@ -83,9 +84,11 @@ The app uses official Scouting America colors (Scouts BSA Red #CE1126, Scouts BS
 ## 7. Quick pre-launch checklist
 
 - [ ] Rename `index-ai.html` to `index.html`.
+- [ ] Confirm the footer shows the right version number (`APP_VERSION`) and organization.
 - [ ] Open the hosted link on a laptop and wait for "🟢 AI Engine Ready" in the Conversation tab; run a full 5-minute conversation.
 - [ ] Complete all three tests yourself at a few different wpm settings.
 - [ ] Confirm audio plays clearly on a laptop and, if Scouts will use them, a phone or tablet.
 - [ ] Check that your meeting location's network can reach `cdn.jsdelivr.net` and `huggingface.co`, or plan to use the built-in script.
 - [ ] Read through `QUOTE_BANK` and `CONV_SCRIPT` and adjust wording to your troop's taste.
 - [ ] Publish (Section 2) and share the link. Let leaders know the certificate is a self-practice record, not a substitute for their sign-off.
+
