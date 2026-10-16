@@ -108,6 +108,12 @@
   #certificate .line{ border-bottom:1px solid #999; display:inline-block; min-width:220px; }
   #certificate table{ margin:20px auto; text-align:left; font-family:'Times New Roman', Georgia, serif; }
   #certificate table td{ padding:3px 10px; }
+  .exch{ border-left:3px solid var(--gold); background:#faf8f2; padding:6px 10px; margin:8px 0; border-radius:0 4px 4px 0; }
+  .exchHead{ font-weight:bold; color:var(--navy); font-size:0.85rem; }
+  .exchHead small{ font-weight:normal; color:#777; }
+  .exchLine{ font-size:0.92rem; margin-top:2px; }
+  .exchActual{ font-weight:bold; color:var(--navy); }
+  .exchSent{ color:var(--red); }
   .refTable{ width:100%; border-collapse:collapse; font-size:0.88rem; margin:8px 0; }
   .refTable th{ text-align:left; color:var(--navy); border-bottom:2px solid var(--gold); padding:6px 8px; }
   .refTable td{ border-bottom:1px solid var(--tan-light); padding:6px 8px; vertical-align:top; }
@@ -142,6 +148,7 @@
   <button data-tab="setup" class="active">Setup</button>
   <button data-tab="settings">Settings</button>
   <button data-tab="resources">Resources</button>
+  <button data-tab="practice">Calibrate &amp; Practice</button>
   <button data-tab="conversation">1. Conversation</button>
   <button data-tab="copy">2. Copy</button>
   <button data-tab="sending">3. Sending</button>
@@ -227,7 +234,7 @@
         <li><strong>Practice in short sessions</strong> (10&ndash;15 minutes) most days, and copy by writing letters as you hear them, without going back to fix them.</li>
         <li><strong>Farnsworth timing:</strong> some trainers (including ARRL practice sessions) send each <em>character</em> at a faster speed, such as 15 wpm, but stretch the gaps between letters and words so the overall speed is slower, such as 5 wpm. That helps you learn each letter as a sound instead of counting dots. When <em>you</em> send, keep your own rhythm even.</li>
         <li><strong>Make a mistake?</strong> Real operators send the <em>error</em> signal (eight dots), pause, and start the word again.</li>
-        <li><strong>Calibrate first.</strong> Before the conversation and sending tests, key <strong>A</strong>, pause the way you would between two words, and key <strong>A</strong> again so the app learns your rhythm.</li>
+        <li><strong>Calibrate once.</strong> In the <strong>Calibrate &amp; Practice</strong> tab, key <strong>A</strong>, pause the way you would between two words, and key <strong>A</strong> again so the app learns your rhythm. It is saved and used for the Conversation and Sending tests.</li>
       </ul>
     </div>
     <div class="card">
@@ -284,7 +291,7 @@
         BASE CAMP: QTH IS CAMP K<br>
         SCOUT: R TNX 73 SK
       </p>
-      <p class="note">In the test, copy each line by ear and key a short reply of your own, ending with K. The conversation does not have to match this example &mdash; it just needs to be a real back-and-forth.</p>
+      <p class="note">In the Conversation test, BASE CAMP uses plain words (no abbreviations or prosigns): copy each line by ear, write it in the Notes box, and key a short reply of your own. It does not have to match this example &mdash; it just needs to be a real back-and-forth.</p>
     </div>
     <div class="card">
       <strong>Learn more</strong>
@@ -296,13 +303,50 @@
     </div>
   </section>
 
+  <!-- CALIBRATE & PRACTICE -->
+  <section id="tab-practice">
+    <h2>Calibrate &amp; Practice</h2>
+    <p class="note">Calibrate once and the app remembers how you key &mdash; your dot and dash lengths and your pauses &mdash; for the Conversation and Sending tests, so you don&rsquo;t have to repeat it each time. It&rsquo;s saved on this device. Recalibrate any time your keying changes (for example, a different speed or a different key).</p>
+    <div class="card">
+      <strong>Calibration</strong><br>
+      <span>Status: <span id="calBadge" class="badge pending">Not calibrated</span></span>
+      <p class="note" id="calSummary"></p>
+      <button class="primary" id="calStart">Start Calibration</button>
+      <button class="secondary" id="calClear" style="display:none;">Clear saved calibration</button>
+      <div id="calArea" style="display:none;">
+        <p class="note">Key the letter <strong>A</strong> (dot-dash, &bull;&ndash;), then pause the way you naturally would <strong>between two words</strong>, then key <strong>A</strong> again. Repeat once or twice, then press &ldquo;Save calibration.&rdquo;</p>
+        <div class="keybtn" id="calKeyBtn">HOLD (click/tap) or press-and-hold the SPACEBAR to key a dot/dash &mdash; release to end it</div>
+        <div class="decoded" id="calDecoded"></div>
+        <div class="raw" id="calRaw" style="font-size:0.85em; opacity:0.75; letter-spacing:1px;"></div>
+        <button class="primary" id="calDone">Save calibration &#10003;</button>
+        <button class="secondary" id="calCancel">Cancel</button>
+        <p class="note" id="calMsg"></p>
+      </div>
+    </div>
+    <div class="card">
+      <strong>Practice</strong>
+      <p class="note">Key anything and watch what the app reads, or pick a practice word below. After you calibrate, practice uses your saved calibration. Nothing here counts toward a requirement.</p>
+      <p>Practice word: <strong id="pracTarget" style="font-size:1.2rem; letter-spacing:2px;">&mdash;</strong></p>
+      <button class="secondary" id="pracNew">New word</button>
+      <button class="secondary" id="pracPlay">&#9654; Hear it</button>
+      <div class="keybtn" id="pracKeyBtn">HOLD (click/tap) or press-and-hold the SPACEBAR to key &mdash; release to end the dot/dash</div>
+      <div class="decoded" id="pracDecoded"></div>
+      <div class="raw" id="pracRaw" style="font-size:0.85em; opacity:0.75; letter-spacing:1px;"></div>
+      <button class="primary" id="pracCheck">Check</button>
+      <button class="secondary" id="pracClear">Clear</button>
+      <div class="result" id="pracFeedback"></div>
+      <p class="note" id="pracRhythm"></p>
+    </div>
+  </section>
+
   <!-- CONVERSATION -->
   <section id="tab-conversation">
     <h2>1. Five-Minute Conversation</h2>
-    <p class="note">The app will play short lines in Morse code — the text is never shown, so you have to copy it by ear, just like a real contact. Use the Notes box to write down what you copy, then key your own reply using the button below or the spacebar (press and hold for dots/dashes, like a telegraph key — you'll hear a tone while it's held down). The session runs for 5 minutes. Send at whatever speed feels natural; the app figures out your dots and dashes on its own. Like a real operator, end each of your turns with the prosign <strong>K</strong> (&ldquo;go ahead&rdquo;) &mdash; see the Resources tab for other prosigns.</p>
+    <p class="note">The app will play short lines in Morse code — the text is never shown, so you have to copy it by ear, just like a real contact. Use the Notes box to write down what you copy, then key your own reply using the button below or the spacebar (press and hold for dots/dashes, like a telegraph key — you'll hear a tone while it's held down). The session runs for 5 minutes. Send at whatever speed feels natural; the app figures out your dots and dashes on its own. Before you reply, write down what you copied in the Notes box. It is saved with each message and cleared when you send your reply, and your leader will see what you wrote next to what BASE CAMP actually sent.</p>
     <div class="card">
       <span>Status: <span id="convBadge" class="badge pending">Not started</span></span>
       <div class="timer" id="convTimer">05:00</div>
+      <div class="note" id="convCalNote"></div>
       <div id="ai-status">⏳ Loading AI Engine (Please wait)...</div>
       <div id="ai-progress-container"><div id="ai-progress-bar"></div></div>
       <button class="primary" id="convStart" disabled>Start Conversation</button>
@@ -320,8 +364,8 @@
         <p class="note" id="convIncomingNote">🔊 BASE CAMP is sending a line in Morse code. Listen closely — the text won't be shown here.</p>
         <button class="secondary" id="convReplay">🔁 Replay this line</button>
 
-        <label for="convNotes">Your notes (write down what you're copying):</label>
-        <textarea id="convNotes" placeholder="Jot down what you think each incoming line says as you copy it..."></textarea>
+        <label for="convNotes">What did you copy from this message?</label>
+        <textarea id="convNotes" placeholder="Write what you think this message says. It is saved with the transcript, then cleared when you send your reply."></textarea>
 
         <div id="convKeyArea" style="display:none;">
           <label>Your reply — key it in Morse:</label>
@@ -331,6 +375,7 @@
         </div>
       </div>
 
+      <button class="secondary" id="convCopyTranscript" style="display:none; margin-top:10px;">&#128203; Copy transcript</button>
       <div class="transcript" id="convTranscript"></div>
     </div>
   </section>
@@ -359,6 +404,7 @@
       <strong>Passage to send:</strong>
       <p id="sendPassage" style="font-style:italic;"></p>
       <span>Status: <span id="sendBadge" class="badge pending">Not started</span></span>
+      <div class="note" id="sendCalNote"></div>
       <button class="primary" id="sendStart">Start Sending Test</button>
       <div id="sendKeyArea" style="display:none;">
         <p class="note" id="sendPhaseNote">First, calibrate: key the letter <strong>A</strong> (dot-dash, &bull;&ndash;), then pause briefly like you naturally would <strong>between two words</strong>, then key <strong>A</strong> again. Repeat once or twice, then press "Start Message" when ready.</p>
@@ -404,7 +450,7 @@
 </main>
 
 <footer id="appFooter">
-  <p>Morse Code Interpreter Strip Trainer &middot; Version <span id="appVersion">2.4</span></p>
+  <p>Morse Code Interpreter Strip Trainer &middot; Version <span id="appVersion">2.5</span></p>
   <p>&copy; <span id="copyYear">2026</span> Troop 10, Redwood City, CA</p>
   <p>Licensed under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0" target="_blank" rel="noopener noreferrer">PolyForm Noncommercial License 1.0.0</a> &middot; <a href="https://github.com/troop10rwc/morse-strip-test-v2" target="_blank" rel="noopener noreferrer">Source code</a></p>
   <p class="disclaimer">Independent, unofficial practice tool. Not affiliated with, endorsed by, or sponsored by Scouting America. &ldquo;Scouting America&rdquo; and &ldquo;Scouts BSA&rdquo; are trademarks of their respective owner.</p>
@@ -421,7 +467,7 @@
 // ---------- App version & footer ----------
 // Single source of truth for the version shown in the footer. Follow
 // semantic versioning (MAJOR.MINOR[.PATCH]) and bump it with each release.
-const APP_VERSION = '2.4';
+const APP_VERSION = '2.5';
 const COPYRIGHT_START_YEAR = 2026; // first year of publication
 (function renderFooter(){
   const y = new Date().getFullYear();
@@ -886,7 +932,34 @@ function makeKeyInput(getWpm){
     return state.msgPresses.map(d => (Math.abs(d-dot) <= Math.abs(d-dash) ? '.' : '-')).join('');
   }
 
-  return { keyDown, keyUp, startPolling, stopPolling, reset, finalizeNow, clearText, state, displayString, rawString, messageSymbols, startCalibrating, endCalibrating };
+  // ---- Saving and reusing a calibration ----
+  // True once the calibration tap demonstrated BOTH a short pause (inside a
+  // letter) and a long one (between words) along with some dot/dash contrast.
+  function calibrationOk(){
+    return gapModel.seedIntra.length > 0 && gapModel.seedWord.length > 0 && state.durationWindow.length >= 2;
+  }
+  // A plain-data snapshot of what the calibration learned (safe to store as JSON).
+  function exportCalibration(){
+    if(!calibrationOk()) return null;
+    return { win: state.durationWindow.slice(-WINDOW_SIZE), unit: smoothedUnit, seedIntra: gapModel.seedIntra.slice(), seedWord: gapModel.seedWord.slice() };
+  }
+  // Load a snapshot into this decoder (call reset() first for a clean start).
+  function importCalibration(c){
+    if(!c || !Array.isArray(c.win) || !c.win.length) return false;
+    state.durationWindow = c.win.slice(-WINDOW_SIZE);
+    smoothedUnit = (typeof c.unit === 'number') ? c.unit : null;
+    gapModel.seedIntra = (c.seedIntra || []).slice();
+    gapModel.seedWord = (c.seedWord || []).slice();
+    gapModel.hist = [];
+    return true;
+  }
+  // Human-readable timing the decoder currently believes, in milliseconds.
+  function rhythmSummary(){
+    const d = twoMeans(state.durationWindow), c = gapCenters(currentUnit());
+    return { dotMs: Math.round(d.dot), dashMs: Math.round(d.dash), intraMs: Math.round(Math.exp(c.ci)), letterMs: Math.round(Math.exp(c.cl)), wordMs: Math.round(Math.exp(c.cw)) };
+  }
+
+  return { keyDown, keyUp, startPolling, stopPolling, reset, finalizeNow, clearText, state, displayString, rawString, messageSymbols, startCalibrating, endCalibrating, calibrationOk, exportCalibration, importCalibration, rhythmSummary };
 }
 
 // ---------- Scoring (used by the Copy and Sending tests) ----------
@@ -1008,26 +1081,25 @@ const SENDING_PASSAGE = (function(){
 })();
 
 // Kept deliberately short — real Morse traffic at slow speeds stays terse
-// for exactly this reason. Each line plus the K prosign (added in code) must
-// play in roughly 24 seconds or less at the 5 wpm minimum, so a beginner
-// still has time to copy it AND key a reply, and the 4-exchange bar is
-// reachable inside 5 minutes (the original first line, "HELLO SCOUT BASE
-// CAMP HERE", took almost a minute to send at 5 wpm). Standard
-// abbreviations keep lines short: UR = your, WX = weather, FB = fine
-// business, TNX = thanks, QTH = location (all listed in the Resources tab).
+// for exactly this reason, and plain words (no abbreviations or prosigns) keep
+// the conversation easy to follow. Each line must play in roughly 24 seconds
+// or less at the 5 wpm minimum, so a beginner still has time to copy it AND
+// key a reply, and the 4-exchange bar is reachable inside 5 minutes (the
+// original first line, "HELLO SCOUT BASE CAMP HERE", took about a minute at
+// 5 wpm).
 const CONV_SCRIPT = [
   "HI SCOUT",
-  "UR NAME",
-  "UR TROOP",
-  "UR MOTTO",
-  "WX UR QTH",
-  "FB TNX",
+  "YOUR NAME",
+  "YOUR TOWN",
+  "WHAT TROOP",
+  "YOUR AGE",
+  "NICE HIKE",
+  "THANK YOU",
   "NEXT BADGE",
-  "UR QTH",
-  "TNX 73",
-  "PSE AGN",
-  "FB",
-  "73 SK"
+  "FUN CAMP",
+  "WELL DONE",
+  "SAY AGAIN",
+  "GOODBYE"
 ];
 
 // ============================================================
@@ -1185,6 +1257,155 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshBadges();
 
   // =========================================================
+  // CALIBRATE & PRACTICE  (one saved calibration shared by every test)
+  // =========================================================
+  function getSavedCalibration(){ return loadState().calibration || null; }
+  // Saves what a decoder learned during its calibration tap. Returns false (and
+  // saves nothing) if the tap didn't show both a short and a long pause.
+  function saveCalibrationFrom(key){
+    const c = key.exportCalibration();
+    if(!c) return false;
+    appState = saveState({ calibration: Object.assign({}, c, { savedAt: new Date().toISOString() }) });
+    refreshCalibrationStatus();
+    return true;
+  }
+  // Resets a decoder and loads the saved calibration into it (if there is one).
+  function applySavedCalibration(key){
+    key.reset();
+    const c = getSavedCalibration();
+    return c ? key.importCalibration(c) : false;
+  }
+  function rhythmText(r){
+    return 'dot ≈ ' + r.dotMs + ' ms, dash ≈ ' + r.dashMs + ' ms; pause inside a letter ≈ ' + r.intraMs +
+           ' ms, between letters ≈ ' + r.letterMs + ' ms, between words ≈ ' + r.wordMs + ' ms (ideal ratio about 1 : 3 : 7).';
+  }
+  function wireKeyButton(btn, key){
+    btn.addEventListener('mousedown', () => { btn.classList.add('down'); key.keyDown(); keySidetone.on(); });
+    btn.addEventListener('mouseup', () => { btn.classList.remove('down'); key.keyUp(); keySidetone.off(); });
+    btn.addEventListener('mouseleave', () => { if(btn.classList.contains('down')){ btn.classList.remove('down'); key.keyUp(); keySidetone.off(); } });
+    btn.addEventListener('touchstart', e => { e.preventDefault(); btn.classList.add('down'); key.keyDown(); keySidetone.on(); });
+    btn.addEventListener('touchend', e => { e.preventDefault(); btn.classList.remove('down'); key.keyUp(); keySidetone.off(); });
+  }
+
+  const calKey = makeKeyInput(currentWpm);
+  const pracKey = makeKeyInput(currentWpm);
+  const calArea = document.getElementById('calArea');
+  const calKeyBtn = document.getElementById('calKeyBtn');
+  const calDecoded = document.getElementById('calDecoded');
+  const calRaw = document.getElementById('calRaw');
+  const calMsg = document.getElementById('calMsg');
+  const pracKeyBtn = document.getElementById('pracKeyBtn');
+  const pracDecoded = document.getElementById('pracDecoded');
+  const pracRaw = document.getElementById('pracRaw');
+  const pracFeedback = document.getElementById('pracFeedback');
+  const pracRhythm = document.getElementById('pracRhythm');
+  const pracTarget = document.getElementById('pracTarget');
+  const PRACTICE_WORDS = ['CAMP', 'SCOUT', 'KNOT', 'FIRE', 'TRAIL', 'HIKE', 'TENT', 'LAKE', 'HELLO', 'MORSE', 'TROOP', 'WATER', 'COMPASS', 'BASE CAMP', 'GOOD LUCK', 'BE PREPARED'];
+  const practiceTabActive = () => document.getElementById('tab-practice').classList.contains('active');
+
+  function refreshCalibrationStatus(){
+    const c = getSavedCalibration();
+    const calText = c
+      ? '✅ Using your saved calibration (you can redo it any time in the Calibrate & Practice tab).'
+      : 'No saved calibration yet — you will do a quick calibration first, and it will be saved for the other tests. (Or do it once now in the Calibrate & Practice tab.)';
+    document.getElementById('convCalNote').textContent = calText;
+    document.getElementById('sendCalNote').textContent = calText;
+    const badge = document.getElementById('calBadge');
+    badge.className = 'badge ' + (c ? 'pass' : 'pending');
+    badge.textContent = c ? 'Calibrated' : 'Not calibrated';
+    document.getElementById('calClear').style.display = c ? 'inline-block' : 'none';
+    document.getElementById('calStart').textContent = c ? '↺ Recalibrate' : 'Start Calibration';
+    let summary = 'No calibration saved yet. Calibrating takes about 20 seconds.';
+    if(c){
+      const tmp = makeKeyInput(currentWpm);
+      tmp.importCalibration(c);
+      summary = 'Saved ' + new Date(c.savedAt || Date.now()).toLocaleString() + '. Your timing: ' + rhythmText(tmp.rhythmSummary());
+    }
+    document.getElementById('calSummary').textContent = summary;
+  }
+
+  function updateCalDisplay(){ calDecoded.textContent = calKey.displayString(); calRaw.textContent = calKey.rawString(); }
+  function startCalibration(){
+    calKey.reset();
+    calKey.startCalibrating();
+    calMsg.textContent = '';
+    updateCalDisplay();
+    calArea.style.display = 'block';
+    calKey.startPolling(updateCalDisplay);
+  }
+  function cancelCalibration(){
+    calKey.stopPolling();
+    calKeyBtn.classList.remove('down');
+    keySidetone.stop();
+    calArea.style.display = 'none';
+  }
+  document.getElementById('calStart').addEventListener('click', startCalibration);
+  document.getElementById('calCancel').addEventListener('click', cancelCalibration);
+  document.getElementById('calClear').addEventListener('click', () => {
+    appState = saveState({ calibration: null });
+    refreshCalibrationStatus();
+    applySavedCalibration(pracKey);
+  });
+  document.getElementById('calDone').addEventListener('click', () => {
+    calKey.finalizeNow();
+    calKey.endCalibrating();
+    if(saveCalibrationFrom(calKey)){
+      calKey.clearText();
+      cancelCalibration();
+      applySavedCalibration(pracKey);          // practice immediately uses the new calibration
+      updatePracDisplay();
+      pracFeedback.textContent = '✅ Calibration saved. Try the practice word below.';
+    } else {
+      calMsg.textContent = 'I couldn’t tell your pause between words from your pauses inside a letter. Key A, then pause noticeably longer, then key A again — at least twice — and try again.';
+      calKey.reset();
+      calKey.startCalibrating();
+      updateCalDisplay();
+    }
+  });
+  wireKeyButton(calKeyBtn, calKey);
+
+  // ----- Practice -----
+  function newPracticeWord(){
+    let w;
+    do { w = PRACTICE_WORDS[Math.floor(Math.random() * PRACTICE_WORDS.length)]; } while(w === pracTarget.textContent && PRACTICE_WORDS.length > 1);
+    pracTarget.textContent = w;
+    clearPractice();
+  }
+  function updatePracDisplay(){
+    pracDecoded.textContent = pracKey.displayString();
+    pracRaw.textContent = pracKey.rawString();
+    pracRhythm.textContent = pracKey.state.msgPresses.length >= 6 ? 'Your rhythm so far: ' + rhythmText(pracKey.rhythmSummary()) : '';
+  }
+  function clearPractice(){
+    pracKey.clearText();
+    pracFeedback.textContent = '';
+    updatePracDisplay();
+  }
+  function startPracticeKey(){
+    applySavedCalibration(pracKey);
+    pracKey.startPolling(updatePracDisplay);
+    updatePracDisplay();
+  }
+  document.getElementById('pracNew').addEventListener('click', newPracticeWord);
+  document.getElementById('pracPlay').addEventListener('click', () => playText(pracTarget.textContent, currentWpm(), currentVol()));
+  document.getElementById('pracClear').addEventListener('click', clearPractice);
+  document.getElementById('pracCheck').addEventListener('click', () => {
+    pracKey.finalizeNow();
+    updatePracDisplay();
+    const got = pracKey.displayString().trim().replace(/\s+/g, ' ');
+    const want = pracTarget.textContent.trim();
+    if(!got) pracFeedback.textContent = 'Nothing keyed yet — key the practice word, then press Check.';
+    else if(got === want) pracFeedback.textContent = '✅ The app read ' + got + ' — that matches!';
+    else pracFeedback.textContent = 'The app read “' + got + '” (the word was “' + want + '”). Check the raw dots and dashes above and keep your spacing even.';
+  });
+  wireKeyButton(pracKeyBtn, pracKey);
+  document.querySelector('#tabs button[data-tab="practice"]').addEventListener('click', () => {
+    if(!pracTarget.textContent || pracTarget.textContent === '—') pracTarget.textContent = PRACTICE_WORDS[0];
+    startPracticeKey();
+  });
+  refreshCalibrationStatus();
+
+  // =========================================================
   // 1. CONVERSATION TEST
   // =========================================================
   const convTimerEl = document.getElementById('convTimer');
@@ -1205,6 +1426,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const convCalibDecoded = document.getElementById('convCalibDecoded');
   const convCalibRaw = document.getElementById('convCalibRaw');
   const convCalibrateDoneBtn = document.getElementById('convCalibrateDone');
+  const convCopyBtn = document.getElementById('convCopyTranscript');
 
   // ---------- AI ENGINE (in-browser LLM via Transformers.js v3) ----------
   // Pinned to v3 on purpose: npm's "latest" is now v4 (different API surface).
@@ -1218,11 +1440,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // exchange is this line PLUS the time the Scout takes to key a reply, so
   // lines are kept to a couple of short words plus the K.
   const AI_MAX_LINE_SECONDS = 24;
-  const AI_SYSTEM_PROMPT = "You are a friendly Base Camp operator talking over a radio to a Scout testing for their Morse Code Interpreter Strip. Speak using short sentences. Keep your response under 12 words total. Always end your message with the single letter 'K'.";
+  const AI_SYSTEM_PROMPT = "You are a friendly Base Camp operator talking over a radio to a Scout testing for their Morse Code Interpreter Strip. Speak using short sentences. Keep your response under 12 words total. Use plain words only: no abbreviations, no prosigns, and no sign-offs such as 'over' or 'K'.";
+  // Hidden example exchanges sent with every request so the small model copies
+  // the style: very short, plain, radio-operator replies (never shown on screen).
+  const AI_FEWSHOT = [
+    { role:'user', content:'My name is Bob.' },
+    { role:'assistant', content:'Nice name.' },
+    { role:'user', content:'Troop 10.' },
+    { role:'assistant', content:'Good troop.' },
+    { role:'user', content:'The weather is sunny.' },
+    { role:'assistant', content:'Great. What did you do?' },
+    { role:'user', content:'We went hiking.' },
+    { role:'assistant', content:'Fun. Where?' }
+  ];
   const AI_OPENERS = [   // tried in order; the first that fits AI_MAX_LINE_SECONDS at the current speed is used
-    "Hello Scout, Base Camp here. K",
-    "Hello Scout. K",
-    "Hi Scout. K"
+    "Hello Scout, Base Camp here.",
+    "Hello Scout, how are you?",
+    "Hello Scout.",
+    "Hi Scout."
   ];
 
   const aiStatusEl = document.getElementById('ai-status');
@@ -1232,6 +1467,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let aiLoadPromise = null;    // so loading only ever starts once
   let chatHistory = [];        // [{role:'user'|'assistant', content}] (system prompt added per call)
   let aiSpokenLines = [];      // what BASE CAMP actually sent (revealed only after the session ends)
+  let aiSpokenSources = [];    // how each line was chosen: opener / model / again / script
+  let lastScoutText = '';      // what the Scout's last reply decoded to
+  let sayAgainStreak = 0;      // consecutive "PSE AGN" requests for unreadable replies
 
   function setAiStatus(text){ aiStatusEl.textContent = text; }
   function setAiProgress(pct){ aiProgBar.style.width = Math.max(0, Math.min(100, pct)).toFixed(1) + '%'; }
@@ -1304,7 +1542,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Make a model reply safe to send as Morse: only characters the app can
   // key, capped so it plays in <= AI_MAX_LINE_SECONDS at the current speed,
-  // and always ending in the prosign K, "go ahead" (small models don't reliably follow that rule).
+  // and plain text only (no "over" or K prosign).
   function morseLineSeconds(text){
     let units = 0;
     buildTimeline(text).forEach(ev => units += ev.units);
@@ -1314,11 +1552,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function aiWords(chunk){
     const t = chunk.toUpperCase().replace(/[‘’]/g, "'").replace(/[^A-Z0-9 .,?'\-\/!:;=@()"]/g, ' ');
     let w = t.split(/\s+/).filter(Boolean).map(x => x.replace(/^[.,!:;=@()"'\-\/]+|[.,!:;=@()"'\-\/]+$/g, '')).filter(Boolean);
-    w = w.filter(x => x.replace(/[^A-Z]/g, '') !== 'OVER');   // "over" is voice procedure, not Morse
-    while(w.length && w[w.length-1] === 'K') w.pop();
+    w = w.filter(x => x.replace(/[^A-Z]/g, '') !== 'OVER');   // plain text only: no "over"
+    while(w.length && w[w.length-1] === 'K') w.pop();         // ...and no K prosign
     return w;
   }
-  const aiFits = words => words.length > 0 && words.length <= 8 && morseLineSeconds(words.join(' ') + ' K') <= AI_MAX_LINE_SECONDS;
+  const aiFits = words => words.length > 0 && words.length <= 8 && morseLineSeconds(words.join(' ')) <= AI_MAX_LINE_SECONDS;
   function sanitizeAiLine(raw){
     if(typeof raw !== 'string') return '';
     // Prefer whole sentences: keep adding sentences while the line still fits,
@@ -1335,15 +1573,7 @@ document.addEventListener('DOMContentLoaded', () => {
       words = sentences[0].slice(0, 8);
       while(words.length > 1 && !aiFits(words)) words.pop();
     }
-    return words.join(' ') + ' K';
-  }
-  // How many ordinary short words fit in one line right now (used to tell the
-  // model how much room it has, so it writes a SHORT reply instead of a long
-  // one that gets cut off).
-  function aiWordBudget(){
-    let n = 1;
-    while(n < 8 && morseLineSeconds(Array(n + 1).fill('NICE').join(' ') + ' K') <= AI_MAX_LINE_SECONDS) n++;
-    return n;
+    return words.join(' ');
   }
   function pickOpener(){
     for(const o of AI_OPENERS){
@@ -1352,16 +1582,105 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return AI_OPENERS[AI_OPENERS.length - 1];
   }
-  async function generateAiReply(){
-    // The system prompt stays as written; a per-turn note tells the model how
-    // many words the radio line has room for at the Scout's current speed.
-    const hint = ' The radio link is slow: reply in at most ' + aiWordBudget() + ' word' + (aiWordBudget() === 1 ? '' : 's') + ', then K.';
-    const messages = [{ role:'system', content: AI_SYSTEM_PROMPT + hint }].concat(chatHistory);
+  async function generateAiReply(temperature){
+    const hint = ' Reply with one very short phrase (one to three words) like a radio operator. No emoji, no sign-off.';
+    const messages = [{ role:'system', content: AI_SYSTEM_PROMPT + hint }].concat(AI_FEWSHOT, chatHistory);
     const result = await aiGenerator(messages, {
-      max_new_tokens: 20, do_sample: true, temperature: 0.7, top_p: 0.9, repetition_penalty: 1.1
+      max_new_tokens: 16, do_sample: true, temperature: temperature, top_p: 0.9, repetition_penalty: 1.15
     });
     const g = result && result[0] && result[0].generated_text;
     return Array.isArray(g) ? (g[g.length - 1] && g[g.length - 1].content) : g;
+  }
+
+  // ----- choosing what BASE CAMP says next -----
+  // Lower-case "Natural" text works much better for a small language model
+  // than ALL-CAPS Morse text, and history is stored WITHOUT the K sign-off so
+  // the model doesn't learn to echo it ("JK SO K ...").
+  function aiNatural(words){
+    const t = words.toLowerCase().replace(/\bi\b/g, 'I').replace(/\s+/g, ' ').trim();
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+  // Turn the key decoder's output into something the model can read: drop the
+  // trailing K, and drop '?' (the decoder's mark for a symbol it couldn't read).
+  function cleanScoutText(raw){
+    const toks = String(raw || '').toUpperCase().split(/\s+/).filter(Boolean);
+    while(toks.length && toks[toks.length-1] === 'K') toks.pop();
+    return toks.map(t => t.replace(/\?/g, '')).filter(Boolean).join(' ');
+  }
+  // Readable = the Scout's reply decoded to at least one real word, and wasn't mostly '?'.
+  function scoutReplyReadable(raw){
+    const s0 = String(raw || '');
+    const q = (s0.match(/\?/g) || []).length, letters = (s0.match(/[A-Za-z0-9]/g) || []).length;
+    if(letters === 0 || q > letters) return false;
+    return cleanScoutText(s0).split(' ').some(t => t.length >= 2);
+  }
+  // Quality gate: nonsense from a tiny model must never go out as Morse.
+  const AI_BAD_WORDS = ['AI', 'SORRY', 'ASSISTANT', 'MODEL', 'CANNOT', 'UNABLE', 'LANGUAGE'];
+  function aiLineIsGood(line){
+    const words = line.split(' ').filter(Boolean);
+    if(words[words.length-1] === 'K') words.pop();
+    if(!words.length) return false;
+    if(!words.some(w => w.replace(/[^A-Z]/g, '').length >= 3)) return false;   // e.g. "JK SO"
+    if(words.some(w => AI_BAD_WORDS.includes(w))) return false;
+    if(new Set(words).size === 1 && words.length >= 3) return false;           // "HA HA HA"
+    const recent = aiSpokenLines.slice(-4);
+    if(recent.includes(line)) return false;                                     // don't repeat yourself
+    return true;
+  }
+  // True if the trimmed line still contains the model's WHOLE first sentence.
+  // A reply cut off mid-sentence ("NICE TO MEET") reads as nonsense, so those
+  // are rejected rather than sent.
+  function aiKeepsFirstSentence(raw, line){
+    const first = raw.split(/(?<=[.!?])\s+/).map(aiWords).filter(w => w.length)[0] || [];
+    const kept = line.split(' ').filter(Boolean);
+    if(kept[kept.length-1] === 'K') kept.pop();
+    return first.length > 0 && kept.length >= first.length;
+  }
+  // Next built-in line that fits the time cap at the current speed and hasn't
+  // been used yet (lines are never cut short, so they always make sense).
+  function nextScriptedLine(){
+    const fits = raw => morseLineSeconds(raw) <= AI_MAX_LINE_SECONDS;
+    for(const skipUsed of [true, false]){
+      for(let i = 0; i < CONV_SCRIPT.length; i++){
+        const raw = CONV_SCRIPT[(convScriptIndex + i) % CONV_SCRIPT.length];
+        if(fits(raw) && !(skipUsed && aiSpokenLines.includes(raw))){ convScriptIndex += i; return raw; }
+      }
+    }
+    return CONV_SCRIPT.slice().sort((x, y) => morseLineSeconds(x) - morseLineSeconds(y))[0];   // nothing fits: the shortest
+  }
+  // Decides BASE CAMP's next line. Returns { line, source } where source is
+  // 'opener', 'again' (couldn't read the Scout), 'model', or 'script'.
+  async function pickBaseCampLine(){
+    if(!aiGenerator) return { line: nextScriptedLine(), source: 'script' };
+    if(chatHistory.length === 0){
+      const o = sanitizeAiLine(pickOpener());
+      chatHistory.push({ role:'assistant', content: aiNatural(o) });
+      return { line: o, source: 'opener' };
+    }
+    // Real operators ask for a repeat when they can't copy you.
+    if(!scoutReplyReadable(lastScoutText)){
+      if(sayAgainStreak < 2){
+        sayAgainStreak++;
+        return { line: sanitizeAiLine('SAY AGAIN') || 'SAY AGAIN', source: 'again' };
+      }
+      return { line: nextScriptedLine(), source: 'script' };
+    }
+    sayAgainStreak = 0;
+    chatHistory.push({ role:'user', content: aiNatural(cleanScoutText(lastScoutText)) });
+    for(const temp of [0.5, 0.9]){
+      let line = '', raw = '';
+      try{ raw = (await generateAiReply(temp) || '').split('\n')[0]; line = sanitizeAiLine(raw); }
+      catch(err){ console.warn('AI generation failed', err); }
+      if(!(line && aiLineIsGood(line) && aiKeepsFirstSentence(raw, line))) console.debug('BASE CAMP: model reply rejected', { raw, line, temp });
+      if(line && aiLineIsGood(line) && aiKeepsFirstSentence(raw, line)){
+        chatHistory.push({ role:'assistant', content: aiNatural(line) });
+        return { line, source: 'model' };
+      }
+    }
+    // The model gave nothing usable twice: fall back to a sensible scripted line.
+    const line = nextScriptedLine();
+    chatHistory.push({ role:'assistant', content: aiNatural(line) });
+    return { line, source: 'script' };
   }
 
   if(AI_LAZY_LOAD){
@@ -1391,6 +1710,9 @@ document.addEventListener('DOMContentLoaded', () => {
   convStartBtn.addEventListener('click', () => {
     convStartBtn.style.display = 'none';
     convStopBtn.style.display = 'inline-block';
+    // A saved calibration (from the Calibrate & Practice tab or an earlier test) is reused:
+    // no need to calibrate again.
+    if(applySavedCalibration(convKey)){ beginConversation(); return; }
     convCalibrating = true;
     convKey.reset();
     convKey.startCalibrating();
@@ -1413,6 +1735,14 @@ document.addEventListener('DOMContentLoaded', () => {
   convCalibrateDoneBtn.addEventListener('click', async () => {
     convKey.finalizeNow();
     convKey.endCalibrating();
+    saveCalibrationFrom(convKey);   // keep it for the other tests too
+    await beginConversation();
+  });
+
+  // Starts the timed conversation (the key decoder is already calibrated).
+  let convExchangeLog = [];       // one entry per exchange: what BASE CAMP sent, what the Scout copied, what the Scout keyed
+  let convAwaitingReply = false;  // true while a BASE CAMP line is waiting for the Scout's reply
+  async function beginConversation(){
     convKey.clearText();
     convKey.stopPolling();
     convCalibrating = false;
@@ -1420,14 +1750,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     convActive = true;
     convTranscript.innerHTML = '';
+    convCopyBtn.style.display = 'none';
     convNotes.value = '';
     convBody.style.display = 'block';
     convSecondsLeft = 300; convScriptIndex = 0; convExchanges = 0;
-    chatHistory = []; aiSpokenLines = [];
+    chatHistory = []; aiSpokenLines = []; aiSpokenSources = []; lastScoutText = ''; sayAgainStreak = 0;
+    convExchangeLog = []; convAwaitingReply = false;
     tickConvTimer();
     convInterval = setInterval(tickConvTimer, 1000);
     await playNextAiLine();
-  });
+  }
 
   convCalibKeyBtn.addEventListener('mousedown', () => { convCalibKeyBtn.classList.add('down'); convKey.keyDown(); keySidetone.on(); });
   convCalibKeyBtn.addEventListener('mouseup', () => { convCalibKeyBtn.classList.remove('down'); convKey.keyUp(); keySidetone.off(); });
@@ -1453,29 +1785,17 @@ document.addEventListener('DOMContentLoaded', () => {
   async function playNextAiLine(){
     if(!convActive || convSecondsLeft <= 0) return;
     convKeyArea.style.display = 'none';
-    let line = '';
-    if(aiGenerator){
-      if(chatHistory.length === 0){
-        line = sanitizeAiLine(pickOpener());
-        chatHistory.push({ role:'assistant', content: line });
-      } else {
-        convReplay.disabled = true;
-        convIncomingNote.textContent = '📡 BASE CAMP is preparing a reply...';
-        try{ line = sanitizeAiLine(await generateAiReply()); }
-        catch(err){ console.warn('AI generation failed, using scripted line', err); line = ''; }
-        if(!convActive || convSecondsLeft <= 0) return; // stopped/expired while the model was thinking
-        if(line) chatHistory.push({ role:'assistant', content: line });
-      }
-    }
-    if(!line){
-      // Scripted fallback (AI not loaded, or the model returned nothing usable)
-      const scripted = CONV_SCRIPT[convScriptIndex % CONV_SCRIPT.length];
-      line = sanitizeAiLine(scripted) || (scripted + ' K');
-      if(aiGenerator) chatHistory.push({ role:'assistant', content: line });
-    }
+    convReplay.disabled = true;
+    convIncomingNote.textContent = '📡 BASE CAMP is preparing a reply...';
+    let pick;
+    try{ pick = await pickBaseCampLine(); }
+    catch(err){ console.warn('Line selection failed, using scripted line', err); pick = { line: nextScriptedLine(), source: 'script' }; }
+    if(!convActive || convSecondsLeft <= 0) return; // stopped/expired while the model was thinking
     convScriptIndex++;
-    currentAiLine = line;
-    aiSpokenLines.push(line);
+    currentAiLine = pick.line;
+    aiSpokenLines.push(pick.line);
+    aiSpokenSources.push(pick.source);
+    convAwaitingReply = true;
     logLine('ai', '🔊 (Morse line sent — copy it by ear, not shown here)');
     await playCurrentLine();
   }
@@ -1515,10 +1835,75 @@ document.addEventListener('DOMContentLoaded', () => {
     convKey.stopPolling();
     const said = convKey.state.text.trim();
     logLine('you', (said || '(no reply keyed)'));
-    if(aiGenerator) chatHistory.push({ role:'user', content: said || '(no reply received)' });
+    // Record this exchange for the leader: what BASE CAMP actually sent, what the
+    // Scout wrote down for it, and what the app recorded from the Scout's key.
+    convExchangeLog.push({ n: convExchangeLog.length + 1, actual: currentAiLine, copied: convNotes.value.trim(), sent: said, source: aiSpokenSources[aiSpokenSources.length - 1] });
+    convNotes.value = '';
+    convAwaitingReply = false;
+    lastScoutText = said;
     convKeyArea.style.display = 'none';
     convExchanges++;
     if(convSecondsLeft > 0) await playNextAiLine();
+  });
+
+  // ----- Transcript for the leader -----
+  // For every message BASE CAMP sent: what the Scout wrote down, with the actual
+  // text in parentheses next to it, followed by the message the app recorded
+  // from the Scout's key. Shown after the session so the answers aren't visible
+  // while the test is running.
+  function exchangeSourceLabel(src){ return src === 'script' ? 'built-in script' : 'AI'; }
+  function renderTranscript(){
+    if(!convExchangeLog.length){
+      logLine('ai', 'No messages were exchanged.');
+      return;
+    }
+    convExchangeLog.forEach(ex => {
+      const box = document.createElement('div');
+      box.className = 'exch';
+      const head = document.createElement('div');
+      head.className = 'exchHead';
+      head.textContent = 'Exchange ' + ex.n + (ex.unanswered ? ' \u2014 not answered ' : ' ');
+      const sm = document.createElement('small');
+      sm.textContent = '(' + exchangeSourceLabel(ex.source) + ')';
+      head.appendChild(sm);
+      const l1 = document.createElement('div');
+      l1.className = 'exchLine';
+      l1.appendChild(document.createTextNode('Scout wrote: \u201C' + (ex.copied || '(nothing written)') + '\u201D '));
+      const act = document.createElement('span');
+      act.className = 'exchActual';
+      act.textContent = '(' + ex.actual + ')';
+      l1.appendChild(act);
+      const l2 = document.createElement('div');
+      l2.className = 'exchLine exchSent';
+      l2.textContent = 'Scout sent (as recorded by the app): \u201C' + (ex.sent || '(no reply keyed)') + '\u201D';
+      box.appendChild(head); box.appendChild(l1); box.appendChild(l2);
+      convTranscript.appendChild(box);
+    });
+    convTranscript.scrollTop = convTranscript.scrollHeight;
+    convCopyBtn.style.display = 'inline-block';
+  }
+  function transcriptAsText(){
+    const st = loadState();
+    const lines = ['Morse Code Interpreter Strip \u2014 Conversation transcript'];
+    lines.push('Scout: ' + (st.name || '(name not set)') + (st.troop ? ', ' + st.troop : '') + (st.council ? ', ' + st.council : ''));
+    lines.push('Date: ' + new Date().toLocaleString());
+    lines.push('');
+    convExchangeLog.forEach(ex => {
+      lines.push('Exchange ' + ex.n + (ex.unanswered ? ' (not answered)' : '') + ' [' + exchangeSourceLabel(ex.source) + ']');
+      lines.push('  Scout wrote: "' + (ex.copied || '(nothing written)') + '" (' + ex.actual + ')');
+      lines.push('  Scout sent (as recorded by the app): "' + (ex.sent || '(no reply keyed)') + '"');
+      lines.push('');
+    });
+    return lines.join('\n').trim();
+  }
+  convCopyBtn.addEventListener('click', () => {
+    const text = transcriptAsText();
+    const done = () => { convCopyBtn.textContent = 'Copied \u2713'; setTimeout(() => { convCopyBtn.innerHTML = '&#128203; Copy transcript'; }, 2000); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, () => window.prompt('Copy the transcript:', text));
+    } else {
+      window.prompt('Copy the transcript:', text);
+    }
   });
 
   function finishConversation(){
@@ -1535,17 +1920,19 @@ document.addEventListener('DOMContentLoaded', () => {
     convStartBtn.disabled = false;
     convStartBtn.style.display = '';
     convStopBtn.style.display = 'none';
-    const notes = convNotes.value.trim();
-    const pass = convExchanges >= 4; // reasonable participation across the 5 minutes
-    const rec = recordResult('convResult', { pass, exchanges: convExchanges, notes, date: new Date().toISOString() });
-    setBadge('convBadge', rec.stored.pass ? 'pass' : 'fail', rec.stored.pass ? 'Completed' : 'Incomplete — practice again');
-    if(notes) logLine('you', '📝 Final notes: ' + notes);
-    if(aiSpokenLines.length){
-      logLine('ai', '--- Answer key (what BASE CAMP actually sent): ' + aiSpokenLines.join(' | ') + ' ---');
+    // A message the Scout heard but never answered still goes in the transcript.
+    if(convAwaitingReply && currentAiLine){
+      convExchangeLog.push({ n: convExchangeLog.length + 1, actual: currentAiLine, copied: convNotes.value.trim(), sent: '', unanswered: true, source: aiSpokenSources[aiSpokenSources.length - 1] });
+      convNotes.value = '';
+      convAwaitingReply = false;
     }
+    const pass = convExchanges >= 4; // reasonable participation across the 5 minutes
+    const rec = recordResult('convResult', { pass, exchanges: convExchanges, notes: transcriptAsText(), transcript: convExchangeLog.slice(), date: new Date().toISOString() });
+    setBadge('convBadge', rec.stored.pass ? 'pass' : 'fail', rec.stored.pass ? 'Completed' : 'Incomplete — practice again');
     logLine('ai', stoppedEarly
-      ? '--- Conversation ended early. Review this transcript (and the notes above) with your unit leader or counselor. ---'
-      : '--- 5 minutes complete. Review this transcript (and the notes above) with your unit leader or counselor. ---');
+      ? '--- Conversation ended early. Review the transcript below with your unit leader or counselor. ---'
+      : '--- 5 minutes complete. Review the transcript below with your unit leader or counselor. ---');
+    renderTranscript();
     if(rec.keptPrevious) logLine('ai', '--- This attempt did not pass, but your earlier passing result is kept. ---');
     else if(!pass) logLine('ai', '--- Not passed yet. Press "Try Conversation Again" to retry; your Copy and Sending results are not affected. ---');
     updateCertificate();
@@ -1652,6 +2039,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('sendStart').addEventListener('click', () => {
     document.getElementById('sendStart').disabled = true;
     sendKeyArea.style.display = 'block';
+    // A saved calibration is reused: go straight to the message.
+    if(applySavedCalibration(sendKey)){
+      sendKey.clearText();
+      updateSendDisplay();
+      sendStartTime = performance.now();
+      enterMessagePhase();
+      sendKey.startPolling(updateSendDisplay);
+      return;
+    }
     sendKey.reset();
     sendKey.startCalibrating();
     updateSendDisplay();
@@ -1674,6 +2070,7 @@ document.addEventListener('DOMContentLoaded', () => {
   sendCalibrateDone.addEventListener('click', () => {
     sendKey.finalizeNow();
     sendKey.endCalibrating();
+    saveCalibrationFrom(sendKey);   // keep it for the other tests too
     sendKey.clearText();
     updateSendDisplay();
     sendStartTime = performance.now();
@@ -1750,6 +2147,11 @@ document.addEventListener('DOMContentLoaded', () => {
       copyPauseBtn.style.display = 'none';
       document.getElementById('copyStart').disabled = false;
     }
+    if(name === 'practice'){
+      pracKey.stopPolling();
+      pracKeyBtn.classList.remove('down');
+      if(calArea.style.display === 'block') cancelCalibration();
+    }
     if(name === 'sending' && sendKeyArea.style.display === 'block'){
       sendKeyBtn.classList.remove('down');
       sendKey.stopPolling();
@@ -1766,7 +2168,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', e => {
     if(e.code !== 'Space' || e.repeat) return;
     if(isTypingTarget(document.activeElement)) return;
-    if(convCalibrateArea.style.display === 'block'){
+    if(practiceTabActive()){
+      e.preventDefault();
+      const [btn, key] = calArea.style.display === 'block' ? [calKeyBtn, calKey] : [pracKeyBtn, pracKey];
+      btn.classList.add('down'); key.keyDown(); keySidetone.on();
+    } else if(convCalibrateArea.style.display === 'block'){
       e.preventDefault();
       convCalibKeyBtn.classList.add('down'); convKey.keyDown(); keySidetone.on();
     } else if(convKeyArea.style.display === 'block'){
@@ -1780,7 +2186,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keyup', e => {
     if(e.code !== 'Space') return;
     if(isTypingTarget(document.activeElement)) return;
-    if(convCalibrateArea.style.display === 'block'){
+    if(practiceTabActive()){
+      e.preventDefault();
+      const [btn, key] = calArea.style.display === 'block' ? [calKeyBtn, calKey] : [pracKeyBtn, pracKey];
+      btn.classList.remove('down'); key.keyUp(); keySidetone.off();
+    } else if(convCalibrateArea.style.display === 'block'){
       e.preventDefault();
       convCalibKeyBtn.classList.remove('down'); convKey.keyUp(); keySidetone.off();
     } else if(convKeyArea.style.display === 'block'){
