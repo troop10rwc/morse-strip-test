@@ -2,6 +2,15 @@
 
 This project follows [Semantic Versioning](https://semver.org/) (MAJOR.MINOR[.PATCH]). The current version is shown in the app footer (`APP_VERSION`).
 
+## 2.4
+- Rebuilt key-gap detection. The decoder now clusters the Scout's actual gaps into three groups (inside a letter, between letters, between words) on a log scale, seeds them from the calibration tap, and re-fits them from all recent gaps on every press, instead of relying on fixed multiples of the dot length. In simulation this fixes letters splitting or merging and words running together for consistent keyers.
+- The AI operator now ends each turn with the prosign K ("go ahead") instead of the word "over"; opening lines and the fallback script follow suit.
+- Added prosign playback (run-together characters such as AR, SK, KN) and decoding of AR, SK, AS and the error signal.
+- Resources tab: timing basics and study tips, a prosign table, common abbreviations and Q-codes, and a sample exchange, all tap-to-play. The conversation instructions now remind Scouts to end their turns with K.
+- Requirement 3 can now be passed two ways (plus the 5 wpm minimum): the decoded text scores 80%+, or the Scout's dots and dashes, aligned to the known passage and ignoring gaps, get 80%+ of words with every element correct and 80%+ of elements. The result screen shows both scores and flags a pass earned the second way; the certificate notes it too.
+- Resources: added a short note on Farnsworth timing.
+- Shorter BASE CAMP lines for more back-and-forth: every line (opening, AI reply, and built-in fallback script) is now capped at about 24 seconds of Morse at the Scout's current speed (was 40; the old first scripted line took nearly a minute at 5 wpm). The model is told how many words fit, over-long replies are trimmed at sentence boundaries, and the fallback script was rewritten with short standard abbreviations (UR, WX, FB, TNX, QTH).
+
 ## 2.3
 - Each requirement can be retried after a failed attempt without affecting the other requirements; the start button relabels to "Try … Again" and the result screen explains how to retry.
 - A previously passed requirement is no longer overwritten by a later failed attempt (retake, early Stop, or leaving the tab mid-session), so the certificate stays unlocked. Attempt counts are recorded per requirement.
