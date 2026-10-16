@@ -108,6 +108,13 @@
   #certificate .line{ border-bottom:1px solid #999; display:inline-block; min-width:220px; }
   #certificate table{ margin:20px auto; text-align:left; font-family:'Times New Roman', Georgia, serif; }
   #certificate table td{ padding:3px 10px; }
+  .refTable{ width:100%; border-collapse:collapse; font-size:0.88rem; margin:8px 0; }
+  .refTable th{ text-align:left; color:var(--navy); border-bottom:2px solid var(--gold); padding:6px 8px; }
+  .refTable td{ border-bottom:1px solid var(--tan-light); padding:6px 8px; vertical-align:top; }
+  .refTable td.sym{ font-weight:bold; color:var(--navy); white-space:nowrap; }
+  .refTable td.pat{ font-family:monospace; letter-spacing:2px; white-space:nowrap; }
+  .refTable tr[data-play]{ cursor:pointer; }
+  .refTable tr[data-play]:hover{ background:#fff; }
   footer#appFooter{
     background:var(--navy); color:#fff; text-align:center; font-size:0.8rem; line-height:1.6;
     padding:16px 16px 20px; border-top:3px solid var(--gold);
@@ -202,6 +209,84 @@
       <div class="morseGrid" id="morseGridPunct"></div>
     </div>
     <div class="card">
+      <strong>Morse code basics</strong>
+      <p class="note">All Morse timing is built from one unit, the length of a dot:</p>
+      <table class="refTable">
+        <tr><th>What</th><th>Length</th></tr>
+        <tr><td>Dot (dit)</td><td>1 unit</td></tr>
+        <tr><td>Dash (dah)</td><td>3 units</td></tr>
+        <tr><td>Gap between dots/dashes inside a letter</td><td>1 unit</td></tr>
+        <tr><td>Gap between letters</td><td>3 units</td></tr>
+        <tr><td>Gap between words</td><td>7 units</td></tr>
+      </table>
+      <p class="note">Speed is measured in words per minute using the word &ldquo;PARIS&rdquo; (50 units). One unit lasts 1200 &divide; wpm milliseconds, so at 5 wpm a dot is 240 ms and a dash is 720 ms.</p>
+      <ul class="note">
+        <li><strong>Learn by sound, not by counting dots and dashes.</strong> Think of each letter as its own little rhythm (&ldquo;di-dah&rdquo; for A), not as a pattern to look up.</li>
+        <li><strong>Steady rhythm beats speed.</strong> Even gaps matter more than going fast. Clear, evenly spaced letters and words are easy for a listener (and for this app) to read.</li>
+        <li><strong>Send each letter in one smooth motion,</strong> then pause a little longer between letters and longer still between words.</li>
+        <li><strong>Practice in short sessions</strong> (10&ndash;15 minutes) most days, and copy by writing letters as you hear them, without going back to fix them.</li>
+        <li><strong>Farnsworth timing:</strong> some trainers (including ARRL practice sessions) send each <em>character</em> at a faster speed, such as 15 wpm, but stretch the gaps between letters and words so the overall speed is slower, such as 5 wpm. That helps you learn each letter as a sound instead of counting dots. When <em>you</em> send, keep your own rhythm even.</li>
+        <li><strong>Make a mistake?</strong> Real operators send the <em>error</em> signal (eight dots), pause, and start the word again.</li>
+        <li><strong>Calibrate first.</strong> Before the conversation and sending tests, key <strong>A</strong>, pause the way you would between two words, and key <strong>A</strong> again so the app learns your rhythm.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <strong>Prosigns (procedural signals)</strong>
+      <p class="note">Prosigns are short signals that run the dots and dashes of two letters together as <em>one</em> character, with no letter gap. Operators use them to manage the conversation. Tap a row to hear it at your current speed.</p>
+      <table class="refTable">
+        <tr><th>Prosign</th><th>Morse</th><th>Meaning</th></tr>
+        <tr data-play="K"><td class="sym">K</td><td class="pat">-.-</td><td>&ldquo;Go ahead&rdquo; &mdash; ends your turn and invites the other station to send. Used instead of saying &ldquo;over.&rdquo; (A plain letter.)</td></tr>
+        <tr data-play="&lt;KN&gt;"><td class="sym">KN</td><td class="pat">-.--.</td><td>Go ahead, <em>only</em> the station I just called</td></tr>
+        <tr data-play="R"><td class="sym">R</td><td class="pat">.-.</td><td>Received / understood (&ldquo;roger&rdquo;)</td></tr>
+        <tr data-play="&lt;AR&gt;"><td class="sym">AR</td><td class="pat">.-.-.</td><td>End of message</td></tr>
+        <tr data-play="&lt;SK&gt;"><td class="sym">SK</td><td class="pat">...-.-</td><td>End of contact &mdash; signing off</td></tr>
+        <tr data-play="&lt;BT&gt;"><td class="sym">BT</td><td class="pat">-...-</td><td>Break / new paragraph (same as the = sign)</td></tr>
+        <tr data-play="&lt;AS&gt;"><td class="sym">AS</td><td class="pat">.-...</td><td>Wait / stand by</td></tr>
+        <tr data-play="CQ"><td class="sym">CQ</td><td class="pat">-.-. --.-</td><td>General call &mdash; &ldquo;anyone listening, please answer.&rdquo; Sent as two letters.</td></tr>
+        <tr data-play="DE"><td class="sym">DE</td><td class="pat">-.. .</td><td>&ldquo;From.&rdquo; &ldquo;BASE CAMP DE SCOUT&rdquo; = &ldquo;Base Camp, this is Scout.&rdquo; Sent as two letters.</td></tr>
+        <tr data-play="?"><td class="sym">?</td><td class="pat">..--..</td><td>Question / please repeat (&ldquo;say again?&rdquo;)</td></tr>
+        <tr data-play="&lt;HH&gt;"><td class="sym">Error</td><td class="pat">........</td><td>Eight dots: mistake &mdash; start the word again</td></tr>
+        <tr data-play="&lt;SOS&gt;"><td class="sym">SOS</td><td class="pat">...---...</td><td>Distress signal, sent as one run-together character</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <strong>Common abbreviations &amp; Q-codes</strong>
+      <p class="note">Operators shorten common words to save time. These are standard in amateur radio (tap a row to hear it).</p>
+      <table class="refTable">
+        <tr><th>Sent</th><th>Means</th></tr>
+        <tr data-play="73"><td class="sym">73</td><td>Best regards (a friendly sign-off)</td></tr>
+        <tr data-play="88"><td class="sym">88</td><td>Love and kisses</td></tr>
+        <tr data-play="TNX"><td class="sym">TNX / TKS</td><td>Thanks</td></tr>
+        <tr data-play="PSE"><td class="sym">PSE</td><td>Please</td></tr>
+        <tr data-play="AGN"><td class="sym">AGN</td><td>Again (&ldquo;PSE AGN&rdquo; = please repeat)</td></tr>
+        <tr data-play="UR"><td class="sym">UR</td><td>Your / you&rsquo;re</td></tr>
+        <tr data-play="HR"><td class="sym">HR</td><td>Here</td></tr>
+        <tr data-play="ES"><td class="sym">ES</td><td>And</td></tr>
+        <tr data-play="GM"><td class="sym">GM / GA / GE</td><td>Good morning / afternoon / evening</td></tr>
+        <tr data-play="WX"><td class="sym">WX</td><td>Weather</td></tr>
+        <tr data-play="RST"><td class="sym">RST</td><td>Signal report: Readability, Strength, Tone</td></tr>
+        <tr data-play="FB"><td class="sym">FB</td><td>Fine business (&ldquo;great&rdquo;)</td></tr>
+        <tr data-play="QTH"><td class="sym">QTH</td><td>My location is&hellip; / What is your location?</td></tr>
+        <tr data-play="QSL"><td class="sym">QSL</td><td>I confirm / I received your message</td></tr>
+        <tr data-play="QRS"><td class="sym">QRS</td><td>Please send more slowly</td></tr>
+        <tr data-play="QRM"><td class="sym">QRM</td><td>I am being interfered with by other stations</td></tr>
+        <tr data-play="QRN"><td class="sym">QRN</td><td>I am troubled by static</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <strong>A sample exchange</strong>
+      <p class="note">Each side signs with <strong>DE</strong> (&ldquo;from&rdquo;) and ends the turn with <strong>K</strong> (&ldquo;go ahead&rdquo;). A short, polite contact might sound like this:</p>
+      <p style="font-family:monospace; line-height:1.7;">
+        BASE CAMP: HELLO SCOUT DE BASE CAMP K<br>
+        SCOUT: BASE CAMP DE SCOUT R HELLO K<br>
+        BASE CAMP: FB UR NAME K<br>
+        SCOUT: NAME IS ALEX PSE AGN UR QTH K<br>
+        BASE CAMP: QTH IS CAMP K<br>
+        SCOUT: R TNX 73 SK
+      </p>
+      <p class="note">In the test, copy each line by ear and key a short reply of your own, ending with K. The conversation does not have to match this example &mdash; it just needs to be a real back-and-forth.</p>
+    </div>
+    <div class="card">
       <strong>Learn more</strong>
       <ul>
         <li><a href="https://www.arrl.org/files/file/Scouting/morse-code-interpreter-strip-final.pdf" target="_blank" rel="noopener">Official Interpreter Strip requirements (ARRL / BSA PDF)</a> — the source sheet these three tests are built from. Fun fact from the sheet: the strip's own dot-dash pattern spells out M‑O‑R‑S‑E.</li>
@@ -214,7 +299,7 @@
   <!-- CONVERSATION -->
   <section id="tab-conversation">
     <h2>1. Five-Minute Conversation</h2>
-    <p class="note">The app will play short lines in Morse code — the text is never shown, so you have to copy it by ear, just like a real contact. Use the Notes box to write down what you copy, then key your own reply using the button below or the spacebar (press and hold for dots/dashes, like a telegraph key — you'll hear a tone while it's held down). The session runs for 5 minutes. Send at whatever speed feels natural; the app figures out your dots and dashes on its own.</p>
+    <p class="note">The app will play short lines in Morse code — the text is never shown, so you have to copy it by ear, just like a real contact. Use the Notes box to write down what you copy, then key your own reply using the button below or the spacebar (press and hold for dots/dashes, like a telegraph key — you'll hear a tone while it's held down). The session runs for 5 minutes. Send at whatever speed feels natural; the app figures out your dots and dashes on its own. Like a real operator, end each of your turns with the prosign <strong>K</strong> (&ldquo;go ahead&rdquo;) &mdash; see the Resources tab for other prosigns.</p>
     <div class="card">
       <span>Status: <span id="convBadge" class="badge pending">Not started</span></span>
       <div class="timer" id="convTimer">05:00</div>
@@ -319,7 +404,7 @@
 </main>
 
 <footer id="appFooter">
-  <p>Morse Code Interpreter Strip Trainer &middot; Version <span id="appVersion">2.3</span></p>
+  <p>Morse Code Interpreter Strip Trainer &middot; Version <span id="appVersion">2.4</span></p>
   <p>&copy; <span id="copyYear">2026</span> Troop 10, Redwood City, CA</p>
   <p>Licensed under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0" target="_blank" rel="noopener noreferrer">PolyForm Noncommercial License 1.0.0</a> &middot; <a href="https://github.com/troop10rwc/morse-strip-test-v2" target="_blank" rel="noopener noreferrer">Source code</a></p>
   <p class="disclaimer">Independent, unofficial practice tool. Not affiliated with, endorsed by, or sponsored by Scouting America. &ldquo;Scouting America&rdquo; and &ldquo;Scouts BSA&rdquo; are trademarks of their respective owner.</p>
@@ -336,7 +421,7 @@
 // ---------- App version & footer ----------
 // Single source of truth for the version shown in the footer. Follow
 // semantic versioning (MAJOR.MINOR[.PATCH]) and bump it with each release.
-const APP_VERSION = '2.3';
+const APP_VERSION = '2.4';
 const COPYRIGHT_START_YEAR = 2026; // first year of publication
 (function renderFooter(){
   const y = new Date().getFullYear();
@@ -362,10 +447,19 @@ const MORSE = {
 };
 const REVERSE_MORSE = {};
 Object.keys(MORSE).forEach(k => REVERSE_MORSE[MORSE[k]] = k);
+// Prosigns a Scout might key as one run-together character.
+Object.assign(REVERSE_MORSE, { '.-.-.':'<AR>', '...-.-':'<SK>', '.-...':'<AS>', '........':'<ERR>' });
 
+// Plain characters are sent as normal letters. A token written <AR>, <SK>,
+// <KN>, <BT>, <AS>, <HH>, <SOS> is a PROSIGN: its letters are sent run
+// together as a single character with no letter gap (e.g. <AR> = .-.-.).
 function textToMorseWords(text){
   return text.toUpperCase().trim().split(/\s+/).filter(Boolean).map(word =>
-    [...word].map(ch => MORSE[ch]).filter(Boolean)
+    (word.match(/<[A-Z]+>|./g) || []).map(tok =>
+      tok.length > 2 && tok[0] === '<'
+        ? [...tok.slice(1, -1)].map(ch => MORSE[ch] || '').join('')
+        : MORSE[tok]
+    ).filter(Boolean)
   );
 }
 
@@ -546,79 +640,85 @@ function makeSidetone(getVolume){
 // of the message comes in.
 function makeKeyInput(getWpm){
   const WINDOW_SIZE = 12; // recent presses used for calibration
-  const state = { down:false, downAt:0, upAt:0, durationWindow:[], pendingDurations:[], text:'', rawText:'', pollTimer:null, calibrating:false, maxCalGap:0, calGaps:[] };
+  const state = { down:false, downAt:0, upAt:0, durationWindow:[], pendingDurations:[], text:'', rawText:'', pollTimer:null, calibrating:false, calGaps:[], msgPresses:[] };
 
-  // A Scout's real "let me think of the next letter" pause between letters
-  // doesn't shrink just because the Settings speed is set higher — it's
-  // roughly constant in real seconds. That means a purely proportional
-  // word-gap threshold (a fixed multiple of the dot length) can misread an
-  // ordinary hesitation as "must be a new word," especially at faster
-  // Settings speeds where the unit is tiny. Testing this directly (a
-  // simulated beginner who pauses a few times longer between letters while
-  // recalling each one) reproduced exactly that: whole messages shattered
-  // into one-letter "words".
-  //
-  // Fix: during the calibration tap (Scout keys "A", pauses like they would
-  // between two words, then keys "A" again), we measure that demonstrated
-  // pause directly and let it RAISE the word-break threshold above the
-  // default — but never lower it. Only raising it means a Scout whose own
-  // natural word-pause is clearly longer than the safe default gets more
-  // headroom against false word-breaks, while a Scout who didn't pause much
-  // (or skipped calibration) still gets the proven-reliable default rather
-  // than a threshold weakened by one noisy sample.
-  let calibratedWordGap = null;
-  // The same calibration tap also demonstrates the Scout's own longest
-  // pause INSIDE a letter (the gap between the dot and the dash of "A").
-  // A beginner at 5 wpm often presses dots briefly but then hesitates a lot
-  // longer than "2 dot-lengths" before the next element; with a threshold
-  // based only on press length, that hesitation was read as the end of the
-  // letter and one letter split into several (A became E T). We cluster the
-  // calibration gaps into "inside a letter" vs "between words" and use the
-  // inside-a-letter ceiling to set the letter-break threshold.
-  let calibratedIntraGap = null;
-  // Fraction of the Scout's demonstrated between-words pause that counts as a word break.
-  const WORD_GAP_FACTOR = 0.6;
-  function startCalibrating(){ state.calibrating = true; state.maxCalGap = 0; state.calGaps = []; }
+  // ---- Adaptive gap model --------------------------------------------
+  // Keying has three kinds of pause: INSIDE a letter (between its dots and
+  // dashes), BETWEEN letters, and BETWEEN words. Judging them only from the
+  // dot length breaks down for real Scouts: a beginner's thinking pauses
+  // have little to do with how long they hold the key, and gap lengths vary
+  // far more than press lengths. So instead we cluster the Scout's actual
+  // gaps into three groups (a small 1-D 3-means on the LOG of each gap,
+  // because timing errors are proportional and the ideal 1:3:7 ratio is
+  // multiplicative) and put the break points half-way between neighbouring
+  // group centres. The clusters start from the calibration tap (key A,
+  // pause like between words, key A), then are re-fitted from ALL recent
+  // gaps on every press. Re-fitting from the raw gaps, rather than from
+  // gaps already labelled, avoids the drift you get when only the gaps that
+  // were judged "short" are ever used to define "short".
+  const GAP_HISTORY = 60;
+  const MIN_LETTER_RATIO = Math.log(1.6);   // letter centre at least 1.6x the in-letter centre
+  const MIN_WORD_RATIO = Math.log(1.5);     // word centre at least 1.5x the letter centre
+  const gapModel = { seedIntra:[], seedWord:[], hist:[] };
+  function mean(a){ return a.reduce((x,y)=>x+y,0) / a.length; }
+  // Returns log-centres {ci, cl, cw} (natural log of milliseconds).
+  function gapCenters(unit){
+    const med = a => { const v = a.slice().sort((x,y)=>x-y), m = v.length >> 1; return v.length % 2 ? v[m] : (v[m-1] + v[m]) / 2; };
+    let ci = Math.log(gapModel.seedIntra.length ? med(gapModel.seedIntra) : unit);
+    let cw = Math.log(gapModel.seedWord.length ? med(gapModel.seedWord) : Math.max(Math.exp(ci)*5, unit*7));
+    if(cw < ci + MIN_LETTER_RATIO + MIN_WORD_RATIO) cw = ci + MIN_LETTER_RATIO + MIN_WORD_RATIO;
+    let cl = (ci + cw) / 2;
+    const data = gapModel.hist.concat(gapModel.seedIntra.map(Math.log), gapModel.seedWord.map(Math.log));
+    if(data.length >= 8){
+      for(let it=0; it<8; it++){
+        const g = [[],[],[]];
+        data.forEach(x => {
+          const d0 = Math.abs(x-ci), d1 = Math.abs(x-cl), d2 = Math.abs(x-cw);
+          (d0 <= d1 && d0 <= d2 ? g[0] : (d1 <= d2 ? g[1] : g[2])).push(x);
+        });
+        if(g[0].length) ci = mean(g[0]);
+        if(g[1].length) cl = mean(g[1]);
+        if(g[2].length) cw = mean(g[2]);
+        // keep the three centres ordered and clearly apart
+        if(cl < ci + MIN_LETTER_RATIO) cl = ci + MIN_LETTER_RATIO;
+        if(cw < cl + MIN_WORD_RATIO) cw = cl + MIN_WORD_RATIO;
+      }
+    }
+    return { ci, cl, cw };
+  }
+  // Gap (ms) at/above which the current letter is finished. Used both when
+  // the next press arrives and by the idle auto-finalize poll.
+  function letterThresh(unit){ const c = gapCenters(unit); return Math.exp((c.ci + c.cl) / 2); }
+  // Gap (ms) at/above which a new word starts.
+  function wordThreshFor(unit){ const c = gapCenters(unit); return Math.exp((c.cl + c.cw) / 2); }
+  function noteGap(gap, unit){
+    // a very long "thinking" pause shouldn't drag the word centre upward
+    const cap = Math.exp(gapCenters(unit).cw) * 2;
+    gapModel.hist.push(Math.log(Math.max(1, Math.min(gap, cap))));
+    if(gapModel.hist.length > GAP_HISTORY) gapModel.hist.shift();
+  }
+  function clearGapModel(){ gapModel.seedIntra = []; gapModel.seedWord = []; gapModel.hist = []; }
+
+  function startCalibrating(){ state.calibrating = true; state.calGaps = []; }
   function endCalibrating(){
     state.calibrating = false;
-    if(state.maxCalGap > 0) calibratedWordGap = state.maxCalGap;
     const g = state.calGaps.slice();
-    if(g.length >= 2){
-      let lo = Math.min(...g), hi = Math.max(...g);
-      for(let i=0;i<8;i++){
-        const a=[], b=[];
-        g.forEach(x => (Math.abs(x-lo) <= Math.abs(x-hi) ? a : b).push(x));
-        if(a.length) lo = a.reduce((x,y)=>x+y,0)/a.length;
-        if(b.length) hi = b.reduce((x,y)=>x+y,0)/b.length;
-      }
-      if(hi >= lo*1.8){
-        const low = g.filter(x => Math.abs(x-lo) <= Math.abs(x-hi));
-        const high = g.filter(x => Math.abs(x-lo) > Math.abs(x-hi));
-        if(low.length) calibratedIntraGap = Math.max(...low);
-        // Use the AVERAGE between-words pause, not the single longest one:
-        // the longest calibration gap is often the extra-long rest between
-        // repeats of "A _ A", which would push the word-break threshold
-        // above the Scout's real word gaps and merge words together.
-        if(high.length) calibratedWordGap = high.reduce((x,y)=>x+y,0)/high.length;
-      }
+    if(g.length < 2) return;
+    // Split the calibration gaps into short (inside a letter) and long
+    // (between words) with a 1-D 2-means on the log of each gap.
+    const lg = g.map(x => Math.log(Math.max(x, 1)));
+    let lo = Math.min(...lg), hi = Math.max(...lg);
+    for(let i=0;i<10;i++){
+      const A=[], B=[];
+      lg.forEach(x => (Math.abs(x-lo) <= Math.abs(x-hi) ? A : B).push(x));
+      if(A.length) lo = A.reduce((x,y)=>x+y,0)/A.length;
+      if(B.length) hi = B.reduce((x,y)=>x+y,0)/B.length;
     }
-  }
-  // Gap (ms) at/above which the current letter is considered finished.
-  // Used both when the next press arrives and by the idle auto-finalize
-  // poll, so a mid-letter hesitation is handled the same way in both.
-  function letterThresh(unit){
-    let t = unit*2.2;
-    if(calibratedIntraGap !== null){
-      t = Math.max(t, calibratedIntraGap*1.3);
-      // keep it comfortably below the word-break threshold
-      if(calibratedWordGap !== null) t = Math.min(t, Math.max(unit*2.2, calibratedWordGap*WORD_GAP_FACTOR*0.6));
+    if(hi - lo >= Math.log(1.8)){
+      const mid = (lo + hi) / 2;
+      gapModel.seedIntra = g.filter((x,i) => lg[i] <  mid);
+      gapModel.seedWord  = g.filter((x,i) => lg[i] >= mid);
     }
-    return t;
-  }
-  function wordThreshFor(unit){
-    const lt = letterThresh(unit);
-    const d = Math.max(unit*4.2, lt*1.8);
-    return calibratedWordGap !== null ? Math.max(d, calibratedWordGap*WORD_GAP_FACTOR) : d;
   }
 
   // Deliberately NOT pre-seeded with a placeholder duration: if the Settings
@@ -707,9 +807,9 @@ function makeKeyInput(getWpm){
     if(state.upAt){
       const gap = now - state.upAt;
       const unit = currentUnit();
-      if(state.calibrating){ state.maxCalGap = Math.max(state.maxCalGap, gap); state.calGaps.push(gap); }
-      const wordThresh = wordThreshFor(unit);
-      if(gap >= wordThresh){
+      if(state.calibrating) state.calGaps.push(gap);
+      const learn = !state.calibrating;
+      if(gap >= wordThreshFor(unit)){
         finalizePending();
         state.text += ' ';
         state.rawText += ' / ';
@@ -717,6 +817,7 @@ function makeKeyInput(getWpm){
         finalizePending();
       }
       // else: intra-character gap — keep accumulating the same letter
+      if(learn) noteGap(gap, unit);
     }
     state.downAt = now;
   }
@@ -734,6 +835,7 @@ function makeKeyInput(getWpm){
     }
     pushDuration(dur);
     state.pendingDurations.push(dur);
+    state.msgPresses.push(dur);
     state.upAt = now;
   }
 
@@ -767,15 +869,24 @@ function makeKeyInput(getWpm){
   }
   function stopPolling(){ if(state.pollTimer) clearInterval(state.pollTimer); state.pollTimer = null; }
 
-  function reset(){ state.down=false; state.downAt=0; state.upAt=0; seedWindow(); smoothedUnit=null; calibratedWordGap=null; calibratedIntraGap=null; state.calibrating=false; state.maxCalGap=0; state.calGaps=[]; state.pendingDurations=[]; state.text=''; state.rawText=''; }
+  function reset(){ state.down=false; state.downAt=0; state.upAt=0; seedWindow(); smoothedUnit=null; clearGapModel(); state.calibrating=false; state.calGaps=[]; state.pendingDurations=[]; state.msgPresses=[]; state.text=''; state.rawText=''; }
   function finalizeNow(){ finalizePending(); }
   // Clears decoded text/pending strokes WITHOUT wiping the calibrated
   // durationWindow — used when moving from a practice/calibration tap into
   // the graded message, or on "Start Over", so the speed contrast already
   // learned isn't thrown away.
-  function clearText(){ state.pendingDurations=[]; state.text=''; state.rawText=''; state.upAt=0; }
+  function clearText(){ state.pendingDurations=[]; state.msgPresses=[]; state.text=''; state.rawText=''; state.upAt=0; }
+  // Every press of the current message classified as '.' or '-' using ONE
+  // dot/dash split over the whole message (steadier than the live decoder's
+  // sliding window), with NO reliance on the gaps. Used to compare what the
+  // Scout keyed against a known passage.
+  function messageSymbols(){
+    if(!state.msgPresses.length) return '';
+    const { dot, dash } = twoMeans(state.msgPresses);
+    return state.msgPresses.map(d => (Math.abs(d-dot) <= Math.abs(d-dash) ? '.' : '-')).join('');
+  }
 
-  return { keyDown, keyUp, startPolling, stopPolling, reset, finalizeNow, clearText, state, displayString, rawString, startCalibrating, endCalibrating };
+  return { keyDown, keyUp, startPolling, stopPolling, reset, finalizeNow, clearText, state, displayString, rawString, messageSymbols, startCalibrating, endCalibrating };
 }
 
 // ---------- Scoring (used by the Copy and Sending tests) ----------
@@ -805,6 +916,49 @@ function scoreWords(truthWords, typedWords){
   const t = truthWords.join(' '), u = typedWords.join(' ');
   const charAccuracy = t.length ? Math.max(0, Math.round((1 - editDistance(t, u) / t.length) * 100)) : 0;
   return { accuracy, charAccuracy, wordErrors };
+}
+
+// Compares the dots and dashes the Scout KEYED against the dots and dashes the
+// passage REQUIRES, ignoring gaps entirely. The Scout's presses are aligned to
+// the expected element sequence with an edit-distance alignment, then:
+//   alignedAccuracy = % of passage words whose every dot/dash was keyed correctly
+//   elementAccuracy = 1 - (element edit distance / expected elements)
+// So a Scout with the right letters but uneven spacing is credited here, while
+// a wrong dot or dash still spoils its word, and extra junk presses lower the
+// element score.
+function alignToPassage(passageWords, observed){
+  const exp = [], owner = [];
+  passageWords.forEach((w, wi) => {
+    [...w.toUpperCase()].forEach(ch => {
+      const code = MORSE[ch];
+      if(code) [...code].forEach(sym => { exp.push(sym); owner.push(wi); });
+    });
+  });
+  const n = exp.length, m = observed.length;
+  const D = Array.from({length: n + 1}, (_, i) => { const r = new Array(m + 1).fill(0); r[0] = i; return r; });
+  for(let j = 0; j <= m; j++) D[0][j] = j;
+  for(let i = 1; i <= n; i++){
+    for(let j = 1; j <= m; j++){
+      D[i][j] = Math.min(D[i-1][j] + 1, D[i][j-1] + 1, D[i-1][j-1] + (exp[i-1] === observed[j-1] ? 0 : 1));
+    }
+  }
+  const matched = new Array(n).fill(false);
+  let i = n, j = m, extra = 0;
+  while(i > 0 || j > 0){
+    if(i > 0 && j > 0 && D[i][j] === D[i-1][j-1] + (exp[i-1] === observed[j-1] ? 0 : 1)){
+      if(exp[i-1] === observed[j-1]) matched[i-1] = true;
+      i--; j--;
+    } else if(i > 0 && D[i][j] === D[i-1][j] + 1){ i--; }   // a required element was not keyed
+    else { j--; extra++; }                                  // an extra press
+  }
+  const wordOK = passageWords.map(() => true);
+  owner.forEach((wi, k) => { if(!matched[k]) wordOK[wi] = false; });
+  const wordsCorrect = wordOK.filter(Boolean).length;
+  return {
+    alignedAccuracy: passageWords.length ? Math.round(100 * wordsCorrect / passageWords.length) : 0,
+    elementAccuracy: n ? Math.max(0, Math.round((1 - D[n][m] / n) * 100)) : 0,
+    wordsCorrect, extraPresses: extra
+  };
 }
 
 // ---------- Persistence ----------
@@ -854,28 +1008,26 @@ const SENDING_PASSAGE = (function(){
 })();
 
 // Kept deliberately short — real Morse traffic at slow speeds stays terse
-// for exactly this reason. At the 5 wpm minimum this app is meant to
-// certify, the ORIGINAL longer lines (e.g. "HELLO SCOUT THIS IS BASE CAMP
-// DO YOU COPY") ate the vast majority of the 5-minute budget just being
-// played back, leaving a beginner as little as ~20 seconds to think through
-// and key EACH reply — nowhere near enough time to reliably reach the
-// 4-exchange participation bar, so the test would fail almost every time
-// regardless of how well a Scout actually sent Morse. Shortening the script
-// leaves ~45+ seconds per reply at 5 wpm, which is realistic for someone
-// still keying letter-by-letter.
+// for exactly this reason. Each line plus the K prosign (added in code) must
+// play in roughly 24 seconds or less at the 5 wpm minimum, so a beginner
+// still has time to copy it AND key a reply, and the 4-exchange bar is
+// reachable inside 5 minutes (the original first line, "HELLO SCOUT BASE
+// CAMP HERE", took almost a minute to send at 5 wpm). Standard
+// abbreviations keep lines short: UR = your, WX = weather, FB = fine
+// business, TNX = thanks, QTH = location (all listed in the Resources tab).
 const CONV_SCRIPT = [
-  "HELLO SCOUT BASE CAMP HERE",
-  "YOUR NAME",
-  "YOUR TROOP",
-  "SCOUT MOTTO",
-  "WEATHER THERE",
-  "FAVORITE ACTIVITY",
-  "GOOD COPY THANKS",
+  "HI SCOUT",
+  "UR NAME",
+  "UR TROOP",
+  "UR MOTTO",
+  "WX UR QTH",
+  "FB TNX",
   "NEXT BADGE",
-  "TROOP NUMBER AGAIN",
-  "GREAT CONTACT BYE",
-  "BASE CAMP OUT",
-  "FINAL MESSAGE"
+  "UR QTH",
+  "TNX 73",
+  "PSE AGN",
+  "FB",
+  "73 SK"
 ];
 
 // ============================================================
@@ -988,6 +1140,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('playPunctuation').addEventListener('click', () => {
     playText(PUNCT_ORDER.join(' '), currentWpm(), currentVol());
   });
+  document.querySelectorAll('#tab-resources [data-play]').forEach(row => {
+    row.title = 'Tap to hear it';
+    row.addEventListener('click', () => playText(row.dataset.play, currentWpm(), currentVol()));
+  });
 
   // ----- Requirement badges -----
   function setBadge(id, state, text){
@@ -1057,14 +1213,16 @@ document.addEventListener('DOMContentLoaded', () => {
   //         is opened (Scouts doing only Copy/Sending never download it).
   // false = start downloading as soon as the page loads.
   const AI_LAZY_LOAD = true;
-  // Longest an AI line may take to play, in seconds. Keeps replies short enough
-  // that several exchanges fit inside the 5-minute window at the Scout's wpm.
-  const AI_MAX_LINE_SECONDS = 40;
-  const AI_SYSTEM_PROMPT = "You are a friendly Base Camp operator talking over a radio to a Scout testing for their Morse Code Interpreter Strip. Speak using short sentences. Keep your response under 12 words total. Always end your message with the word 'Over'.";
-  const AI_OPENERS = [
-    "Hello Scout, welcome to Base Camp. How is your campout going? Over.",
-    "Hello Scout, Base Camp here. How are you? Over.",
-    "Hello Scout, Base Camp here. Over."
+  // Longest a BASE CAMP line may take to play, in seconds (at the Scout's
+  // current speed). A 5-minute test needs several back-and-forths, and each
+  // exchange is this line PLUS the time the Scout takes to key a reply, so
+  // lines are kept to a couple of short words plus the K.
+  const AI_MAX_LINE_SECONDS = 24;
+  const AI_SYSTEM_PROMPT = "You are a friendly Base Camp operator talking over a radio to a Scout testing for their Morse Code Interpreter Strip. Speak using short sentences. Keep your response under 12 words total. Always end your message with the single letter 'K'.";
+  const AI_OPENERS = [   // tried in order; the first that fits AI_MAX_LINE_SECONDS at the current speed is used
+    "Hello Scout, Base Camp here. K",
+    "Hello Scout. K",
+    "Hi Scout. K"
   ];
 
   const aiStatusEl = document.getElementById('ai-status');
@@ -1146,22 +1304,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Make a model reply safe to send as Morse: only characters the app can
   // key, capped so it plays in <= AI_MAX_LINE_SECONDS at the current speed,
-  // and always ending in OVER (small models don't reliably follow that rule).
+  // and always ending in the prosign K, "go ahead" (small models don't reliably follow that rule).
   function morseLineSeconds(text){
     let units = 0;
     buildTimeline(text).forEach(ev => units += ev.units);
     return units * (1.2 / currentWpm());
   }
+  // Clean one chunk of text into a list of Morse-safe words (no OVER, no trailing K).
+  function aiWords(chunk){
+    const t = chunk.toUpperCase().replace(/[‘’]/g, "'").replace(/[^A-Z0-9 .,?'\-\/!:;=@()"]/g, ' ');
+    let w = t.split(/\s+/).filter(Boolean).map(x => x.replace(/^[.,!:;=@()"'\-\/]+|[.,!:;=@()"'\-\/]+$/g, '')).filter(Boolean);
+    w = w.filter(x => x.replace(/[^A-Z]/g, '') !== 'OVER');   // "over" is voice procedure, not Morse
+    while(w.length && w[w.length-1] === 'K') w.pop();
+    return w;
+  }
+  const aiFits = words => words.length > 0 && words.length <= 8 && morseLineSeconds(words.join(' ') + ' K') <= AI_MAX_LINE_SECONDS;
   function sanitizeAiLine(raw){
     if(typeof raw !== 'string') return '';
-    let t = raw.toUpperCase().replace(/[‘’]/g, "'").replace(/[^A-Z0-9 .,?'\-\/!:;=@()"]/g, ' ');
-    let words = t.split(/\s+/).filter(Boolean).map(w => w.replace(/^[.,!:;=@()"'\-\/]+|[.,!:;=@()"'\-\/]+$/g, '')).filter(Boolean);
-    // drop any "OVER" the model produced; we re-append exactly one at the end
-    words = words.filter(w => w.replace(/[^A-Z]/g, '') !== 'OVER');
-    words = words.slice(0, 11);
-    while(words.length > 1 && morseLineSeconds(words.join(' ') + ' OVER') > AI_MAX_LINE_SECONDS) words.pop();
-    if(!words.length) return '';
-    return words.join(' ') + ' OVER';
+    // Prefer whole sentences: keep adding sentences while the line still fits,
+    // so a cut-down reply still makes sense instead of stopping mid-sentence.
+    const sentences = raw.split(/(?<=[.!?])\s+/).map(aiWords).filter(w => w.length);
+    if(!sentences.length) return '';
+    let words = [];
+    for(const sent of sentences){
+      const next = words.concat(sent);
+      if(aiFits(next)) words = next; else break;
+    }
+    if(!words.length){
+      // even the first sentence is too long: fall back to cutting words
+      words = sentences[0].slice(0, 8);
+      while(words.length > 1 && !aiFits(words)) words.pop();
+    }
+    return words.join(' ') + ' K';
+  }
+  // How many ordinary short words fit in one line right now (used to tell the
+  // model how much room it has, so it writes a SHORT reply instead of a long
+  // one that gets cut off).
+  function aiWordBudget(){
+    let n = 1;
+    while(n < 8 && morseLineSeconds(Array(n + 1).fill('NICE').join(' ') + ' K') <= AI_MAX_LINE_SECONDS) n++;
+    return n;
   }
   function pickOpener(){
     for(const o of AI_OPENERS){
@@ -1171,9 +1353,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return AI_OPENERS[AI_OPENERS.length - 1];
   }
   async function generateAiReply(){
-    const messages = [{ role:'system', content: AI_SYSTEM_PROMPT }].concat(chatHistory);
+    // The system prompt stays as written; a per-turn note tells the model how
+    // many words the radio line has room for at the Scout's current speed.
+    const hint = ' The radio link is slow: reply in at most ' + aiWordBudget() + ' word' + (aiWordBudget() === 1 ? '' : 's') + ', then K.';
+    const messages = [{ role:'system', content: AI_SYSTEM_PROMPT + hint }].concat(chatHistory);
     const result = await aiGenerator(messages, {
-      max_new_tokens: 28, do_sample: true, temperature: 0.7, top_p: 0.9, repetition_penalty: 1.1
+      max_new_tokens: 20, do_sample: true, temperature: 0.7, top_p: 0.9, repetition_penalty: 1.1
     });
     const g = result && result[0] && result[0].generated_text;
     return Array.isArray(g) ? (g[g.length - 1] && g[g.length - 1].content) : g;
@@ -1284,7 +1469,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if(!line){
       // Scripted fallback (AI not loaded, or the model returned nothing usable)
-      line = CONV_SCRIPT[convScriptIndex % CONV_SCRIPT.length];
+      const scripted = CONV_SCRIPT[convScriptIndex % CONV_SCRIPT.length];
+      line = sanitizeAiLine(scripted) || (scripted + ' K');
       if(aiGenerator) chatHistory.push({ role:'assistant', content: line });
     }
     convScriptIndex++;
@@ -1520,14 +1706,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const truthWords = SENDING_PASSAGE.toUpperCase().split(/\s+/);
     const { accuracy, charAccuracy } = scoreWords(truthWords, sentWords);
     const effectiveWpm = elapsedMin > 0 ? (25/elapsedMin) : 0;
-    const pass = accuracy >= 80 && effectiveWpm >= 4.5; // small tolerance around 5 wpm
-    const rec = recordResult('sendResult', { pass, accuracy, wpm: Math.round(effectiveWpm*10)/10, date: new Date().toISOString() });
+    // Two ways to pass the accuracy part (either is enough):
+    //  1) the app decoded >= 80% of the words on its own from the Scout's timing, or
+    //  2) the Scout's dots and dashes matched the passage: >= 80% of words with every
+    //     element correct AND >= 80% of individual elements (so junk presses don't help).
+    const al = alignToPassage(truthWords, sendKey.messageSymbols());
+    const decodedPass = accuracy >= 80;
+    const alignedPass = al.alignedAccuracy >= 80 && al.elementAccuracy >= 80;
+    const speedOK = effectiveWpm >= 4.5; // small tolerance around 5 wpm
+    const pass = (decodedPass || alignedPass) && speedOK;
+    const passedBy = pass ? (decodedPass ? 'decoded' : 'aligned') : null;
+    const rec = recordResult('sendResult', { pass, passedBy, accuracy, alignedAccuracy: al.alignedAccuracy, elementAccuracy: al.elementAccuracy, wpm: Math.round(effectiveWpm*10)/10, date: new Date().toISOString() });
     setBadge('sendBadge', rec.stored.pass ? 'pass' : 'fail', rec.stored.pass ? 'Passed' : 'Try again');
     document.getElementById('sendResult').innerHTML =
       'Decoded: <em>'+ (sendKey.state.text || '(nothing decoded)') +'</em><br>'+
       'Raw pattern: <code>'+ (sendKey.rawString() || '(none)') +'</code><br>'+
-      'Accuracy vs. passage: '+accuracy+'% (need 80%+) &middot; letter-level match: '+charAccuracy+'%<br>'+
+      'Decoded-text accuracy: '+accuracy+'% (the app read your spacing on its own) &middot; letter-level match: '+charAccuracy+'%<br>'+
+      'Dots &amp; dashes matched to the passage: '+al.alignedAccuracy+'% of words ('+al.wordsCorrect+' of '+truthWords.length+' with every dot and dash correct) &middot; '+al.elementAccuracy+'% of individual elements<br>'+
+      'To pass: 80%+ on <em>either</em> accuracy score, and at least 5 wpm.<br>'+
       'Effective speed: '+ (Math.round(effectiveWpm*10)/10) +' wpm (need 5+, some tolerance given)' +
+      (pass && passedBy === 'aligned' ? '<br>Passed on the dots-and-dashes score: your letters were right, but the app could not fully read your letter/word spacing. A leader may want to watch a live send to confirm the spacing.' : '') +
       (rec.keptPrevious ? '<br>This attempt did not pass, but your earlier passing result is kept.'
         : (!pass ? '<br>Press &ldquo;Try Sending Again&rdquo; to retry. Your other requirements are not affected.' : ''));
     sendKeyArea.style.display = 'none';
@@ -1609,7 +1807,8 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('certCouncil').textContent = s.council || '—';
       document.getElementById('certConv').textContent = 'Completed — ' + s.convResult.exchanges + ' exchanges over 5 minutes';
       document.getElementById('certCopy').textContent = 'Passed — ' + s.copyResult.accuracy + '% accuracy';
-      document.getElementById('certSend').textContent = 'Passed — ' + s.sendResult.wpm + ' wpm, ' + s.sendResult.accuracy + '% accuracy';
+      document.getElementById('certSend').textContent = 'Passed — ' + s.sendResult.wpm + ' wpm, ' +
+        (s.sendResult.passedBy === 'aligned' ? s.sendResult.alignedAccuracy + '% of words keyed correctly (dots/dashes matched to passage)' : s.sendResult.accuracy + '% accuracy');
       const latest = [s.convResult.date, s.copyResult.date, s.sendResult.date].sort().pop();
       document.getElementById('certDate').textContent = new Date(latest).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
     }
@@ -1621,3 +1820,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
